@@ -4,9 +4,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { PhoneProvider, usePhone } from '@/contexts/phone-context';
 import { appMap } from '@/config/apps';
-import { Wifi, BatteryFull, BatteryMedium, BatteryLow, Signal, SignalLow, SignalMedium, Volume2, Power, VolumeX, Volume1, Volume, Sun, Moon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Home } from 'lucide-react';
+import { Wifi, BatteryFull, BatteryMedium, BatteryLow, Signal, SignalLow, SignalMedium, Power, Sun } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ControlCenter from './control-center';
 import { motion, PanInfo, AnimatePresence } from 'framer-motion';
@@ -76,29 +74,31 @@ const StatusBar = ({ onDragStart, onDrag, onDragEnd }: { onDragStart: any, onDra
 };
 
 const VolumeIndicator = ({ volume, isVisible }: { volume: number, isVisible: boolean }) => {
-    const getVolumeIcon = () => {
-        if (volume === 0) return <VolumeX className="h-5 w-5" />;
-        if (volume <= 50) return <Volume1 className="h-5 w-5" />;
-        return <Volume2 className="h-5 w-5" />;
-    };
-    
     return (
         <AnimatePresence>
             {isVisible && (
                 <motion.div
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20, transition: { duration: 0.3, delay: 1.5 } }}
-                    className="absolute top-16 left-1/2 -translate-x-1/2 z-30 bg-black/70 backdrop-blur-sm text-white rounded-full px-4 py-2 flex items-center gap-2 shadow-lg"
+                    initial={{ y: -50, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1, transition: { type: 'spring', stiffness: 300, damping: 30 } }}
+                    exit={{ y: -50, opacity: 0, transition: { duration: 0.5, ease: 'anticipate', delay: 1.5 } }}
+                    className="absolute top-0 left-0 right-0 z-30 flex justify-center pt-2"
                 >
-                    {getVolumeIcon()}
-                    <div className="w-24 h-1.5 bg-white/30 rounded-full">
-                        <motion.div 
-                            className="h-full bg-white rounded-full"
-                            initial={{ width: `${volume}%`}}
-                            animate={{ width: `${volume}%`}}
-                            transition={{ ease: 'easeOut', duration: 0.2 }}
-                        />
+                    <div className="w-32 h-2 rounded-full bg-black/50 backdrop-blur-sm shadow-lg overflow-hidden">
+                        <motion.div
+                            className="h-full bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-400"
+                            style={{ width: `${volume}%` }}
+                            transition={{ ease: 'easeOut', duration: 0.3 }}
+                        >
+                            <motion.div
+                                className="h-full w-full opacity-30"
+                                style={{
+                                    backgroundImage: 'linear-gradient(45deg, rgba(255,255,255,0.4) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0.4) 75%, transparent 75%, transparent)',
+                                    backgroundSize: '20px 20px',
+                                }}
+                                animate={{ backgroundPositionX: ['0px', '20px'] }}
+                                transition={{ repeat: Infinity, duration: 0.8, ease: 'linear' }}
+                            />
+                        </motion.div>
                     </div>
                 </motion.div>
             )}
@@ -241,5 +241,3 @@ const PhoneContentWithButtons = () => {
 }
 
 export default Phone;
-
-    
