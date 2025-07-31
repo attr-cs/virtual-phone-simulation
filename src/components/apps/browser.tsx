@@ -8,10 +8,6 @@ import { ArrowLeft, ArrowRight, RotateCw, X, Globe, Lock } from 'lucide-react';
 import { usePhone } from '@/contexts/phone-context';
 import { cn } from '@/lib/utils';
 
-// Using a proxy to render mobile-friendly content.
-// This is a free, public proxy.
-const PROXY_URL = 'https://mighty-river-22690-6119de03a831.herokuapp.com/';
-
 const BrowserApp = () => {
     const { setApp } = usePhone();
     const [iframeSrc, setIframeSrc] = useState('');
@@ -40,7 +36,7 @@ const BrowserApp = () => {
     useEffect(() => {
         if (history[historyIndex]) {
             const currentUrl = history[historyIndex];
-            setIframeSrc(`${PROXY_URL}${currentUrl}`);
+            setIframeSrc(currentUrl);
             
             try {
                 const urlObject = new URL(currentUrl);
@@ -84,8 +80,7 @@ const BrowserApp = () => {
 
     const refresh = () => {
         if (iframeRef.current) {
-            // Appending a timestamp to the URL to bypass cache
-            setIframeSrc(iframeSrc.split('?ts=')[0] + '?ts=' + new Date().getTime());
+            iframeRef.current.src = iframeSrc;
         }
     };
 
@@ -110,13 +105,13 @@ const BrowserApp = () => {
       </header>
       
       <main className="flex-1 bg-white">
-        {iframeSrc && <iframe
+        {iframeSrc ? <iframe
           ref={iframeRef}
           src={iframeSrc}
           title="Browser"
           className="w-full h-full border-0"
           sandbox="allow-forms allow-modals allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"
-        ></iframe>}
+        ></iframe> : <div className="flex items-center justify-center h-full text-muted-foreground">Loading...</div>}
       </main>
     </div>
   );
