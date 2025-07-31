@@ -7,6 +7,49 @@ import { apps, type AppConfig } from '@/config/apps';
 import { useToast } from "@/hooks/use-toast"
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Leaf, Droplet, TreePine, Zap, Shield } from 'lucide-react';
+
+const ThemedIconWrapper = ({ children, iconSize, iconRadius }: { children: React.ReactNode, iconSize: number, iconRadius: number }) => {
+    const { iconTheme } = usePhone();
+    const borderRadius = `${iconRadius}px`;
+
+    switch (iconTheme) {
+        case 'minimalist':
+            return <div className="flex items-center justify-center w-full h-full bg-zinc-100 dark:bg-zinc-800" style={{ borderRadius }}>{children}</div>;
+        case 'skeuomorphic':
+            return <div className="flex items-center justify-center w-full h-full bg-[#d5c5b5] shadow-[inset_0_2px_4px_rgba(0,0,0,0.2),0_2px_2px_rgba(255,255,255,0.5)]" style={{ borderRadius }}>{children}</div>;
+        case 'pixel':
+            return <div className="flex items-center justify-center w-full h-full bg-[#4a00e0] image-rendering-pixelated" style={{ borderRadius }}>{children}</div>;
+        case 'nature-inspired':
+             return (
+                <div className="relative flex items-center justify-center w-full h-full bg-gradient-to-br from-green-200 to-emerald-400" style={{ borderRadius }}>
+                    <div className="absolute inset-0 bg-repeat bg-center opacity-10" style={{backgroundImage: 'url(/wood-pattern.svg)'}}></div>
+                    <Leaf className="absolute -top-1 -right-1 text-green-700/80" size={iconSize * 0.4}/>
+                    <Droplet className="absolute -bottom-1 -left-1 text-blue-500/70" size={iconSize * 0.3} />
+                    {children}
+                </div>
+            );
+        case 'tech-scifi':
+            const hexPath = "M30.05 3.35a2 2 0 0 1 1.73 1L38.63 18a2 2 0 0 1 0 2l-6.85 13.65a2 2 0 0 1-1.73 1H8.15a2 2 0 0 1-1.73-1L-.43 20a2 2 0 0 1 0-2L6.42 4.35a2 2 0 0 1 1.73-1h21.9z";
+            return (
+                 <div className="relative flex items-center justify-center w-full h-full bg-zinc-900" style={{ clipPath: `url(#hexagon-clip-${iconSize})` }}>
+                     <svg className="absolute w-0 h-0">
+                        <defs>
+                            <clipPath id={`hexagon-clip-${iconSize}`} clipPathUnits="objectBoundingBox">
+                                <path d="M0.999 0.25a0.053 0.053 0 0 1 0.046 0.026l0.228 0.457a0.053 0.053 0 0 1 0 0.053l-0.228 0.457A0.053 0.053 0 0 1 0.999 1.25H0.214a0.053 0.053 0 0 1 -0.046 -0.026L-0.06 -0.207A0.053 0.053 0 0 1 -0.06 -0.26l0.228 -0.457A0.053 0.053 0 0 1 0.214 -0.75h0.785z" transform="scale(0.025, 0.025) translate(15, 15)"/>
+                            </clipPath>
+                        </defs>
+                     </svg>
+                     <div className="absolute inset-0 bg-cyan-400/20 animate-pulse" />
+                     <Zap className="absolute text-yellow-300/80" size={iconSize * 0.8}/>
+                     {children}
+                </div>
+            );
+        default:
+            return <>{children}</>;
+    }
+}
+
 
 const AppIcon = ({ app }: { app: AppConfig }) => {
   const { 
@@ -41,33 +84,34 @@ const AppIcon = ({ app }: { app: AppConfig }) => {
 
   const isThemeActive = iconTheme !== 'none';
   
-  const currentStyle = isThemeActive ? styles.default : (styles[iconStyle] || styles.default);
+  const currentStyle = styles[iconStyle] || styles.default;
 
   const iconContainerStyles: React.CSSProperties = {
     width: `${iconSize}px`,
     height: `${iconSize}px`,
     borderRadius: `${iconRadius}px`,
-    backgroundColor: isThemeActive ? undefined : iconBackgroundColor,
+    backgroundColor: iconBackgroundColor,
   };
-
+  
   const iconProps = {
     style: {
-      color: isThemeActive ? undefined : iconColor,
+      color: isThemeActive ? (iconTheme === 'minimalist' ? '#000' : '#FFF') : iconColor,
       width: `${iconSize * 0.5}px`,
       height: `${iconSize * 0.5}px`,
+      filter: iconTheme === 'skeuomorphic' ? 'drop-shadow(1px 1px 1px rgba(0,0,0,0.4))' : 'none'
     },
-    className: currentStyle.icon,
+    className: cn(!isThemeActive && currentStyle.icon, 'relative z-10'),
+    strokeWidth: iconTheme === 'pixel' ? 0 : 2,
+    fill: iconTheme === 'pixel' ? 'currentColor' : 'none'
   };
 
   const renderIconContent = () => {
+    const iconEl = <Icon {...iconProps} />;
+    
     if (isThemeActive) {
-        let themeName = app.name.substring(0, 3);
-         return <div className={cn("flex items-center justify-center w-full h-full text-white font-bold text-xs bg-cover bg-center", 
-            iconTheme === 'minimalist' && "bg-zinc-100 text-black",
-            iconTheme === 'skeuomorphic' && "bg-amber-300 text-black shadow-inner",
-            iconTheme === 'pixel' && "bg-purple-500 text-white font-mono"
-        )} style={{ borderRadius: `${iconRadius}px`}}>{themeName}</div>
+        return <ThemedIconWrapper iconSize={iconSize} iconRadius={iconRadius}>{iconEl}</ThemedIconWrapper>;
     }
+    
     return (
         <div 
             className={cn(
@@ -76,7 +120,7 @@ const AppIcon = ({ app }: { app: AppConfig }) => {
             )}
             style={iconContainerStyles}
         >
-            <Icon {...iconProps} />
+            {iconEl}
         </div>
     )
   }

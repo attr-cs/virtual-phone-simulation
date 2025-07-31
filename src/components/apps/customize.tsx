@@ -24,9 +24,11 @@ const iconStyles: { id: IconStyle, name: string }[] = [
 ]
 
 const iconThemes: { id: IconTheme, name: string, description: string, preview: string }[] = [
-    { id: 'minimalist', name: 'Minimalist', description: 'Clean lines, monochrome.', preview: 'https://placehold.co/100x100/f0f0f0/000000?text=Min' },
-    { id: 'skeuomorphic', name: 'Skeuomorphic', description: 'Realistic textures and depth.', preview: 'https://placehold.co/100x100/d2b48c/ffffff?text=Skeuo' },
-    { id: 'pixel', name: 'Pixel Art', description: 'Retro 8-bit charm.', preview: 'https://placehold.co/100x100/8a2be2/ffffff?text=Pixel' },
+    { id: 'minimalist', name: 'Minimalist', description: 'Clean lines, monochrome.', preview: 'https://placehold.co/100x100/f0f0f0/111111?text=Aa' },
+    { id: 'skeuomorphic', name: 'Skeuomorphic', description: 'Realistic textures.', preview: 'https://placehold.co/100x100/d2b48c/4a3b2a?text=Aa' },
+    { id: 'pixel', name: 'Pixel Art', description: 'Retro 8-bit charm.', preview: 'https://placehold.co/100x100/4a00e0/ffffff?text=Aa' },
+    { id: 'nature-inspired', name: 'Nature', description: 'Organic forms and colors.', preview: 'https://placehold.co/100x100/228B22/ffffff?text=Aa' },
+    { id: 'tech-scifi', name: 'Sci-Fi', description: 'Futuristic and glowing.', preview: 'https://placehold.co/100x100/00ffff/000000?text=Aa' },
 ]
 
 const IconPreview = () => {
@@ -40,7 +42,7 @@ const IconPreview = () => {
     } = usePhone();
 
     const styles = {
-        default: { iconContainer: "backdrop-blur-md", icon: "" },
+        default: { iconContainer: "bg-zinc-800", icon: "" },
         glass: { iconContainer: "backdrop-blur-lg border border-white/20 bg-white/10", icon: "text-white" },
         neumorphic: { iconContainer: "bg-zinc-200/80 dark:bg-zinc-800/80 shadow-[4px_4px_8px_#bebebe,-4px_-4px_8px_#ffffff] dark:shadow-[4px_4px_8px_#1a1a1a,-4px_-4px_8px_#2e2e2e]", icon: "text-zinc-800 dark:text-white" },
         simple: { iconContainer: "bg-transparent", icon: "text-white" }
@@ -48,34 +50,39 @@ const IconPreview = () => {
     
     const isThemeActive = iconTheme !== 'none';
     
-    const currentStyle = isThemeActive ? styles.default : (styles[iconStyle] || styles.default);
+    const currentStyle = styles[iconStyle] || styles.default;
     
-    const finalIconRadius = isThemeActive ? '16px' : `${iconRadius}px`;
-
     const iconContainerStyles: React.CSSProperties = {
         width: `${iconSize}px`,
         height: `${iconSize}px`,
-        borderRadius: finalIconRadius,
-        backgroundColor: isThemeActive ? undefined : iconBackgroundColor,
+        borderRadius: `${iconRadius}px`,
+        backgroundColor: iconBackgroundColor,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
     };
 
     let content;
     if (isThemeActive) {
         const theme = iconThemes.find(t => t.id === iconTheme);
         content = (
-            <div 
+             <div 
                 className={cn("flex items-center justify-center w-full h-full text-white font-bold text-xs bg-cover bg-center")}
                 style={{ 
                     backgroundImage: `url(${theme?.preview})`,
                     backgroundSize: 'cover',
-                    borderRadius: `${iconRadius}px`
+                    borderRadius: `${iconRadius}px`,
+                    width: `${iconSize}px`,
+                    height: `${iconSize}px`,
                 }}
-            />
+            >
+                <Smartphone size={iconSize * 0.5} />
+            </div>
         )
     } else {
          content = (
             <div 
-                className={cn("flex items-center justify-center shadow-md transition-all w-full h-full", currentStyle.iconContainer)}
+                className={cn("flex items-center justify-center shadow-md transition-all", currentStyle.iconContainer)}
                 style={iconContainerStyles}
             >
                 <Smartphone 
@@ -92,12 +99,10 @@ const IconPreview = () => {
 
     return (
         <Card className="bg-zinc-800 p-4 flex items-center justify-center bg-cover bg-center h-[200px]" style={{ backgroundImage: `url(https://picsum.photos/seed/1/390/844)` }}>
-             <div className="flex flex-col items-center gap-1.5 text-center">
-                <motion.div layout>
-                    {content}
-                </motion.div>
+             <motion.div layout className="flex flex-col items-center gap-1.5 text-center">
+                {content}
                 <span className="text-white text-xs font-medium drop-shadow-md font-sans [text-shadow:0_1px_1px_rgba(0,0,0,0.4)]">Your App</span>
-             </div>
+             </motion.div>
         </Card>
     )
 }
@@ -211,11 +216,11 @@ const CustomizeApp = () => {
                         <ScrollArea className="flex-1" hideScrollbar>
                             <div className="p-4 space-y-6">
                                 
-                                <div className={cn("space-y-4 transition-opacity", areControlsDisabled && "opacity-50 pointer-events-none")}>
+                                <div className={"space-y-4"}>
                                     <Label className="text-base font-semibold">Icon Size</Label>
                                     <div className="space-y-2">
                                         <Label className="flex items-center gap-2 text-sm text-muted-foreground"><ArrowDownUp size={16} /> Size</Label>
-                                        <Slider value={[iconSize]} onValueChange={(v) => setIconSize(v[0])} min={40} max={80} step={2} disabled={areControlsDisabled} />
+                                        <Slider value={[iconSize]} onValueChange={(v) => setIconSize(v[0])} min={40} max={80} step={2} />
                                     </div>
                                 </div>
                                 
@@ -229,24 +234,24 @@ const CustomizeApp = () => {
                                         </button>
                                     ))}
                                     </div>
-                                </div>
 
-                                <div className={cn("space-y-4 transition-opacity", areControlsDisabled && "opacity-50 pointer-events-none")}>
-                                    <Label className="text-base font-semibold">Colors</Label>
-                                    <div className="flex items-center gap-4">
-                                        <Label htmlFor="icon-color" className="flex items-center gap-2 text-sm text-muted-foreground"><Palette size={16} /> Icon</Label>
-                                        <Input id="icon-color" type="color" value={iconColor} onChange={(e) => setIconColor(e.target.value)} className="w-16 h-8 p-0.5" disabled={areControlsDisabled} />
+                                    <div className="space-y-4">
+                                        <Label className="text-base font-semibold">Colors</Label>
+                                        <div className="flex items-center gap-4">
+                                            <Label htmlFor="icon-color" className="flex items-center gap-2 text-sm text-muted-foreground"><Palette size={16} /> Icon</Label>
+                                            <Input id="icon-color" type="color" value={iconColor} onChange={(e) => setIconColor(e.target.value)} className="w-16 h-8 p-0.5" />
+                                        </div>
+                                        <div className="flex items-center gap-4">
+                                        <Label htmlFor="bg-color" className="flex items-center gap-2 text-sm text-muted-foreground"><Wallpaper size={16} /> Background</Label>
+                                        <Input id="bg-color" type="color" value={iconBackgroundColor} onChange={(e) => setIconBackgroundColor(e.target.value)} className="w-16 h-8 p-0.5" />
+                                        </div>
                                     </div>
-                                    <div className="flex items-center gap-4">
-                                    <Label htmlFor="bg-color" className="flex items-center gap-2 text-sm text-muted-foreground"><Wallpaper size={16} /> Background</Label>
-                                    <Input id="bg-color" type="color" value={iconBackgroundColor} onChange={(e) => setIconBackgroundColor(e.target.value)} className="w-16 h-8 p-0.5" disabled={areControlsDisabled} />
-                                    </div>
-                                </div>
 
-                                <div className={cn("space-y-2 transition-opacity", areControlsDisabled && "opacity-50 pointer-events-none")}>
-                                    <Label className="text-base font-semibold">Style Controls</Label>
-                                    <Label className="flex items-center gap-2 text-sm text-muted-foreground"><CornerLeftUp size={16} /> Corner Radius</Label>
-                                    <Slider value={[iconRadius]} onValueChange={(v) => setIconRadius(v[0])} min={0} max={40} step={2} disabled={areControlsDisabled} />
+                                    <div className="space-y-2">
+                                        <Label className="text-base font-semibold">Style Controls</Label>
+                                        <Label className="flex items-center gap-2 text-sm text-muted-foreground"><CornerLeftUp size={16} /> Corner Radius</Label>
+                                        <Slider value={[iconRadius]} onValueChange={(v) => setIconRadius(v[0])} min={0} max={40} step={2} />
+                                    </div>
                                 </div>
 
                                 <div className="space-y-4">

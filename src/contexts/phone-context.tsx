@@ -6,7 +6,7 @@ import type { AppId } from '@/config/apps';
 import { wallpapers } from '@/config/apps';
 
 export type IconStyle = 'default' | 'glass' | 'neumorphic' | 'simple';
-export type IconTheme = 'none' | 'minimalist' | 'skeuomorphic' | 'pixel';
+export type IconTheme = 'none' | 'minimalist' | 'skeuomorphic' | 'pixel' | 'nature-inspired' | 'tech-scifi';
 
 interface PhoneContextType {
   app: AppId;
