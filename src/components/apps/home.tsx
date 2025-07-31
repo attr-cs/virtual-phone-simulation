@@ -12,6 +12,7 @@ const AppIcon = ({ app }: { app: AppConfig }) => {
   const { 
     setApp, 
     iconStyle, 
+    iconTheme,
     iconColor,
     iconBackgroundColor,
     iconSize,
@@ -38,19 +39,23 @@ const AppIcon = ({ app }: { app: AppConfig }) => {
     simple: { iconContainer: "bg-transparent", icon: "text-white" }
   };
 
-  const currentStyle = styles[iconStyle] || styles.default;
-  const isDefaultStyle = iconStyle === 'default';
+  const isThemeActive = iconTheme !== 'none';
+  const isDefaultStyle = iconStyle === 'default' && !isThemeActive;
+
+  const currentStyle = isThemeActive ? styles.default : (styles[iconStyle] || styles.default);
 
   const iconContainerStyles: React.CSSProperties = {
     width: `${iconSize}px`,
     height: `${iconSize}px`,
-    borderRadius: isDefaultStyle ? `${iconRadius}px` : (iconStyle === 'simple' ? '0px' : '16px'),
   };
   
   if (isDefaultStyle) {
     iconContainerStyles.backgroundColor = iconBackgroundColor;
+    iconContainerStyles.borderRadius = `${iconRadius}px`;
+  } else if (!isThemeActive) {
+    iconContainerStyles.borderRadius = (iconStyle === 'simple' ? '0px' : '16px');
   }
-  
+
   const iconProps = {
     style: {
       color: isDefaultStyle ? iconColor : undefined,
@@ -60,6 +65,28 @@ const AppIcon = ({ app }: { app: AppConfig }) => {
     className: isDefaultStyle ? '' : currentStyle.icon,
   };
 
+  const renderIconContent = () => {
+    if (isThemeActive) {
+        let themeName = app.name.substring(0, 3);
+         return <div className={cn("flex items-center justify-center w-full h-full text-white font-bold text-xs bg-cover bg-center", 
+            iconTheme === 'minimalist' && "bg-zinc-100 text-black",
+            iconTheme === 'skeuomorphic' && "bg-amber-300 text-black shadow-inner",
+            iconTheme === 'pixel' && "bg-purple-500 text-white font-mono"
+        )} style={{ borderRadius: `${iconRadius}px`}}>{themeName}</div>
+    }
+    return (
+        <div 
+            className={cn(
+            "flex items-center justify-center shadow-md transition-all w-full h-full",
+            currentStyle.iconContainer
+            )}
+            style={iconContainerStyles}
+        >
+            <Icon {...iconProps} />
+        </div>
+    )
+  }
+
 
   return (
     <motion.button 
@@ -68,14 +95,8 @@ const AppIcon = ({ app }: { app: AppConfig }) => {
         whileTap={{ scale: 0.9 }}
         whileHover={{ scale: 1.1 }}
     >
-      <div 
-        className={cn(
-          "flex items-center justify-center shadow-md transition-all",
-          currentStyle.iconContainer
-       )}
-       style={iconContainerStyles}
-      >
-        <Icon {...iconProps} />
+      <div style={{ width: `${iconSize}px`, height: `${iconSize}px`}}>
+        {renderIconContent()}
       </div>
       <span className="text-white text-xs font-medium drop-shadow-md font-sans [text-shadow:0_1px_1px_rgba(0,0,0,0.4)]">{app.name}</span>
     </motion.button>

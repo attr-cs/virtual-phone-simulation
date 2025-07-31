@@ -1,18 +1,19 @@
 
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
-import { usePhone, IconStyle } from '@/contexts/phone-context';
+import { usePhone, IconStyle, IconTheme } from '@/contexts/phone-context';
 import { wallpapers } from '@/config/apps';
-import { X, Wallpaper, Sparkles, Palette, Smartphone, CornerLeftUp, ArrowDownUp } from 'lucide-react';
+import { X, Wallpaper, Sparkles, Palette, Smartphone, CornerLeftUp, ArrowDownUp, Check, ChevronLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Button } from '../ui/button';
 
 const iconStyles: { id: IconStyle, name: string }[] = [
     { id: 'default', name: 'Default' },
@@ -21,9 +22,16 @@ const iconStyles: { id: IconStyle, name: string }[] = [
     { id: 'simple', name: 'Simple' },
 ]
 
+const iconThemes: { id: IconTheme, name: string, description: string, preview: string }[] = [
+    { id: 'minimalist', name: 'Minimalist', description: 'Clean lines, monochrome.', preview: 'https://placehold.co/100x100/f0f0f0/000000?text=Min' },
+    { id: 'skeuomorphic', name: 'Skeuomorphic', description: 'Realistic textures and depth.', preview: 'https://placehold.co/100x100/d2b48c/ffffff?text=Skeuo' },
+    { id: 'pixel', name: 'Pixel Art', description: 'Retro 8-bit charm.', preview: 'https://placehold.co/100x100/8a2be2/ffffff?text=Pixel' },
+]
+
 const IconPreview = () => {
     const { 
         iconStyle, 
+        iconTheme,
         iconColor, 
         iconBackgroundColor,
         iconSize,
@@ -37,11 +45,11 @@ const IconPreview = () => {
         simple: { iconContainer: "bg-transparent", icon: "text-white" }
     }
     
-    const currentStyle = styles[iconStyle] || styles.default;
+    const isThemeActive = iconTheme !== 'none';
+    const isDefaultStyle = iconStyle === 'default' && !isThemeActive;
     
-    // Customization applies only to 'default' style
-    const isDefaultStyle = iconStyle === 'default';
-
+    const currentStyle = isThemeActive ? styles.default : (styles[iconStyle] || styles.default);
+    
     const iconFinalColor = isDefaultStyle ? iconColor : currentStyle.icon;
     
     const iconContainerStyles: React.CSSProperties = {
@@ -53,22 +61,40 @@ const IconPreview = () => {
     if (isDefaultStyle) {
         iconContainerStyles.backgroundColor = iconBackgroundColor;
     }
-
+    
+    let content;
+    if (isThemeActive) {
+        let themeName = iconTheme.charAt(0).toUpperCase() + iconTheme.slice(1);
+        content = <div className={cn("flex items-center justify-center w-full h-full text-white font-bold text-xs bg-cover bg-center rounded-lg", 
+            iconTheme === 'minimalist' && "bg-zinc-100 text-black",
+            iconTheme === 'skeuomorphic' && "bg-amber-300 text-black shadow-inner",
+            iconTheme === 'pixel' && "bg-purple-500 text-white"
+        )} style={{ borderRadius: `${iconRadius}px`}}>{themeName}</div>
+    } else {
+         content = (
+            <div 
+                className={cn("flex items-center justify-center shadow-md transition-all w-full h-full", currentStyle.iconContainer)}
+                style={{
+                    ...iconContainerStyles,
+                    borderRadius: (iconStyle === 'default' && !isThemeActive) ? `${iconRadius}px` : '16px'
+                }}
+            >
+                <Smartphone 
+                    style={{ 
+                        color: iconFinalColor,
+                        width: `${iconSize * 0.5}px`,
+                        height: `${iconSize * 0.5}px`
+                     }}
+                />
+            </div>
+        )
+    }
 
     return (
         <Card className="bg-zinc-800 p-4 flex items-center justify-center bg-cover bg-center" style={{ backgroundImage: `url(https://picsum.photos/seed/1/390/844)` }}>
              <div className="flex flex-col items-center gap-1.5 text-center">
-                <div 
-                    className={cn("flex items-center justify-center shadow-md transition-all", currentStyle.iconContainer)}
-                    style={iconContainerStyles}
-                >
-                    <Smartphone 
-                        style={{ 
-                            color: iconFinalColor,
-                            width: `${iconSize * 0.5}px`,
-                            height: `${iconSize * 0.5}px`
-                         }}
-                    />
+                <div style={{ width: `${iconSize}px`, height: `${iconSize}px` }}>
+                    {content}
                 </div>
                 <span className="text-white text-xs font-medium drop-shadow-md font-sans [text-shadow:0_1px_1px_rgba(0,0,0,0.4)]">Your App</span>
              </div>
@@ -81,13 +107,60 @@ const CustomizeApp = () => {
         setApp, 
         wallpaper, setWallpaper,
         iconStyle, setIconStyle,
+        iconTheme, setIconTheme,
         iconColor, setIconColor,
         iconBackgroundColor, setIconBackgroundColor,
         iconSize, setIconSize,
         iconRadius, setIconRadius
     } = usePhone();
 
+    const [view, setView] = useState<'main' | 'themes'>('main');
+
+    const isThemeActive = iconTheme !== 'none';
     const isDefaultStyle = iconStyle === 'default';
+    const areControlsDisabled = isThemeActive || !isDefaultStyle;
+
+
+    if (view === 'themes') {
+        return (
+             <div className="bg-background h-full flex flex-col font-sans app-container">
+                <header className="p-4 pt-12 bg-background/80 backdrop-blur-sm border-b sticky top-0 z-10 flex items-center shrink-0">
+                    <Button variant="ghost" size="icon" className="h-8 w-8 -ml-2 mr-2" onClick={() => setView('main')}><ChevronLeft size={20}/></Button>
+                    <h1 className="text-xl font-headline font-bold">Icon Themes</h1>
+                </header>
+                <ScrollArea className="flex-1 min-h-0" hideScrollbar>
+                    <div className="p-4 grid grid-cols-2 gap-4">
+                        <Card 
+                            className={cn("overflow-hidden cursor-pointer transition-all", 'none' === iconTheme ? 'border-primary ring-2 ring-primary scale-105' : 'border-border')}
+                             onClick={() => { setIconTheme('none'); setView('main'); }}
+                        >
+                            <CardHeader>
+                                <CardTitle className="text-lg">None</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-sm text-muted-foreground">Use customizable styles.</p>
+                            </CardContent>
+                        </Card>
+                        {iconThemes.map((theme) => (
+                             <Card 
+                                key={theme.id} 
+                                className={cn("overflow-hidden cursor-pointer transition-all", theme.id === iconTheme ? 'border-primary ring-2 ring-primary scale-105' : 'border-border')}
+                                onClick={() => { setIconTheme(theme.id); setView('main'); }}
+                            >
+                                <CardHeader className="flex flex-row items-center gap-4 space-y-0">
+                                     <Image src={theme.preview} width={50} height={50} alt={theme.name} className="rounded-lg" data-ai-hint="icon theme preview" />
+                                     <CardTitle className="text-lg">{theme.name}</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <p className="text-sm text-muted-foreground">{theme.description}</p>
+                                </CardContent>
+                             </Card>
+                        ))}
+                    </div>
+                </ScrollArea>
+             </div>
+        )
+    }
 
     return (
         <div className="bg-background h-full flex flex-col font-sans app-container">
@@ -95,9 +168,9 @@ const CustomizeApp = () => {
                 <h1 className="text-xl font-headline font-bold">Customize</h1>
                 <button onClick={() => setApp('home')} className="p-1"><X size={20}/></button>
             </header>
-            <div className="flex-1 min-h-0">
+             <div className="flex-1 flex flex-col min-h-0">
                  <Tabs defaultValue="wallpaper" className="h-full flex flex-col">
-                    <TabsList className="w-full rounded-none sticky top-0 bg-background z-10 shrink-0 grid grid-cols-2">
+                    <TabsList className="w-full rounded-none bg-background z-10 shrink-0 grid grid-cols-2">
                         <TabsTrigger value="wallpaper" className="flex-1 gap-2"><Wallpaper size={16}/> Wallpaper</TabsTrigger>
                         <TabsTrigger value="icons" className="flex-1 gap-2"><Sparkles size={16}/> Icons</TabsTrigger>
                     </TabsList>
@@ -122,12 +195,20 @@ const CustomizeApp = () => {
                     <TabsContent value="icons" className="flex-1 min-h-0">
                         <ScrollArea className="h-full" hideScrollbar>
                             <div className="p-4 space-y-6">
-                                <div>
+                                <div className="sticky top-0 bg-background/80 backdrop-blur-sm py-4 z-10 -mx-4 px-4">
                                     <Label className="text-base font-semibold mb-2 block">Live Preview</Label>
                                     <IconPreview />
                                 </div>
 
                                 <div className="space-y-4">
+                                    <Label className="text-base font-semibold">Icon Size</Label>
+                                    <div className="space-y-2">
+                                        <Label className="flex items-center gap-2 text-sm text-muted-foreground"><ArrowDownUp size={16} /> Size</Label>
+                                        <Slider value={[iconSize]} onValueChange={(v) => setIconSize(v[0])} min={40} max={80} step={2} />
+                                    </div>
+                                </div>
+                                
+                                <div className={cn("space-y-4 transition-opacity", isThemeActive && "opacity-50 pointer-events-none")}>
                                     <Label className="text-base font-semibold">Icon Style</Label>
                                     <div className="grid grid-cols-2 gap-4">
                                     {iconStyles.map((style) => (
@@ -139,28 +220,34 @@ const CustomizeApp = () => {
                                     </div>
                                 </div>
 
-                                <div className={cn("space-y-4 transition-opacity", !isDefaultStyle && "opacity-50 pointer-events-none")}>
+                                <div className={cn("space-y-4 transition-opacity", areControlsDisabled && "opacity-50 pointer-events-none")}>
                                     <Label className="text-base font-semibold">Colors</Label>
                                     <div className="flex items-center gap-4">
                                         <Label htmlFor="icon-color" className="flex items-center gap-2 text-sm text-muted-foreground"><Palette size={16} /> Icon</Label>
-                                        <Input id="icon-color" type="color" value={iconColor} onChange={(e) => setIconColor(e.target.value)} className="w-16 h-8 p-0.5" disabled={!isDefaultStyle} />
+                                        <Input id="icon-color" type="color" value={iconColor} onChange={(e) => setIconColor(e.target.value)} className="w-16 h-8 p-0.5" disabled={areControlsDisabled} />
                                     </div>
                                     <div className="flex items-center gap-4">
                                     <Label htmlFor="bg-color" className="flex items-center gap-2 text-sm text-muted-foreground"><Wallpaper size={16} /> Background</Label>
-                                    <Input id="bg-color" type="color" value={iconBackgroundColor} onChange={(e) => setIconBackgroundColor(e.target.value)} className="w-16 h-8 p-0.5" disabled={!isDefaultStyle} />
+                                    <Input id="bg-color" type="color" value={iconBackgroundColor} onChange={(e) => setIconBackgroundColor(e.target.value)} className="w-16 h-8 p-0.5" disabled={areControlsDisabled} />
                                     </div>
                                 </div>
 
+                                <div className={cn("space-y-2 transition-opacity", areControlsDisabled && "opacity-50 pointer-events-none")}>
+                                    <Label className="flex items-center gap-2 text-sm text-muted-foreground"><CornerLeftUp size={16} /> Corner Radius</Label>
+                                    <Slider value={[iconRadius]} onValueChange={(v) => setIconRadius(v[0])} min={0} max={40} step={2} disabled={areControlsDisabled} />
+                                </div>
+
                                 <div className="space-y-4">
-                                    <Label className="text-base font-semibold">Sizing & Spacing</Label>
-                                    <div className="space-y-2">
-                                        <Label className="flex items-center gap-2 text-sm text-muted-foreground"><ArrowDownUp size={16} /> Icon Size</Label>
-                                        <Slider value={[iconSize]} onValueChange={(v) => setIconSize(v[0])} min={40} max={80} step={2} />
-                                    </div>
-                                    <div className={cn("space-y-2 transition-opacity", !isDefaultStyle && "opacity-50 pointer-events-none")}>
-                                        <Label className="flex items-center gap-2 text-sm text-muted-foreground"><CornerLeftUp size={16} /> Corner Radius</Label>
-                                        <Slider value={[iconRadius]} onValueChange={(v) => setIconRadius(v[0])} min={0} max={40} step={2} disabled={!isDefaultStyle} />
-                                    </div>
+                                     <Label className="text-base font-semibold">Icon Theme</Label>
+                                     <Card className="cursor-pointer hover:bg-muted" onClick={() => setView('themes')}>
+                                        <CardContent className="p-4 flex items-center justify-between">
+                                            <div>
+                                                <h3 className="font-semibold">{iconTheme === 'none' ? 'None' : iconThemes.find(t => t.id === iconTheme)?.name}</h3>
+                                                <p className="text-sm text-muted-foreground">Select a pre-designed theme.</p>
+                                            </div>
+                                            {iconTheme !== 'none' && <Image src={iconThemes.find(t => t.id === iconTheme)?.preview || ''} width={40} height={40} alt="theme preview" className="rounded-md" />}
+                                        </CardContent>
+                                     </Card>
                                 </div>
                             </div>
                         </ScrollArea>

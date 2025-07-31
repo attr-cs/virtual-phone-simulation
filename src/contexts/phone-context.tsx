@@ -6,6 +6,7 @@ import type { AppId } from '@/config/apps';
 import { wallpapers } from '@/config/apps';
 
 export type IconStyle = 'default' | 'glass' | 'neumorphic' | 'simple';
+export type IconTheme = 'none' | 'minimalist' | 'skeuomorphic' | 'pixel';
 
 interface PhoneContextType {
   app: AppId;
@@ -16,6 +17,8 @@ interface PhoneContextType {
   setBrightness: (level: number) => void;
   iconStyle: IconStyle;
   setIconStyle: (style: IconStyle) => void;
+  iconTheme: IconTheme;
+  setIconTheme: (theme: IconTheme) => void;
   iconColor: string;
   setIconColor: (color: string) => void;
   iconBackgroundColor: string;
@@ -33,6 +36,7 @@ export const PhoneProvider = ({ children }: { children: ReactNode }) => {
   const [currentWallpaper, setCurrentWallpaper] = useState<string>(wallpapers[0].url);
   const [brightness, setBrightness] = useState(100);
   const [iconStyle, setIconStyle] = useState<IconStyle>('default');
+  const [iconTheme, setIconTheme] = useState<IconTheme>('none');
   const [iconColor, setIconColor] = useState('#ffffff');
   const [iconBackgroundColor, setIconBackgroundColor] = useState('rgba(255, 255, 255, 0.3)');
   const [iconSize, setIconSize] = useState(56); // Corresponds to w-14 h-14
@@ -48,6 +52,8 @@ export const PhoneProvider = ({ children }: { children: ReactNode }) => {
     setBrightness,
     iconStyle,
     setIconStyle,
+    iconTheme,
+    setIconTheme,
     iconColor,
     setIconColor,
     iconBackgroundColor,
