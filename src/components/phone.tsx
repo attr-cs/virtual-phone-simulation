@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Home } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ControlCenter from '@/components/control-center';
-import { motion, PanInfo } from 'framer-motion';
+import { motion, PanInfo, AnimatePresence } from 'framer-motion';
 
 const StatusBar = ({ onDragStart, onDrag, onDragEnd }: { onDragStart: any, onDrag: any, onDragEnd: any }) => {
   const [time, setTime] = useState('');
@@ -103,16 +103,25 @@ const PhoneContent = () => {
           className="w-full h-full app-screen bg-cover bg-center"
           style={{ backgroundImage: app === 'home' ? `url(${wallpaper})` : 'none' }}
         >
-          <div className="app-container h-full">
-            {CurrentApp ? <CurrentApp /> : <p>This app is not available.</p>}
-          </div>
+          <AnimatePresence mode="wait">
+              <motion.div
+                  key={app}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.3, ease: 'easeInOut' }}
+                  className="h-full"
+              >
+                  {CurrentApp ? <CurrentApp /> : <p>This app is not available.</p>}
+              </motion.div>
+          </AnimatePresence>
         </div>
         {app !== 'home' && (
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 h-16 flex items-center justify-center">
+            <div className="absolute bottom-0 left-0 right-0 h-16 flex items-center justify-center pointer-events-none">
                <Button 
                   variant="ghost" 
                   size="icon" 
-                  className="bg-white/20 hover:bg-white/30 text-white rounded-full h-12 w-12 backdrop-blur-sm"
+                  className="bg-white/20 hover:bg-white/30 text-white rounded-full h-12 w-12 backdrop-blur-sm pointer-events-auto"
                   onClick={() => setApp('home')}
                   aria-label="Home"
                 >

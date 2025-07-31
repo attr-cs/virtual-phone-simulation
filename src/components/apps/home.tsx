@@ -6,7 +6,7 @@ import { usePhone } from '@/contexts/phone-context';
 import { apps, type AppConfig } from '@/config/apps';
 import { useToast } from "@/hooks/use-toast"
 import { cn } from '@/lib/utils';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const AppIcon = ({ app }: { app: AppConfig }) => {
   const { 
@@ -33,36 +33,30 @@ const AppIcon = ({ app }: { app: AppConfig }) => {
   };
 
   const styles = {
-    default: { iconContainer: "backdrop-blur-md", icon: "" },
+    default: { iconContainer: "", icon: "" },
     glass: { iconContainer: "backdrop-blur-lg border border-white/20 bg-white/10", icon: "text-white" },
     neumorphic: { iconContainer: "bg-zinc-200/80 dark:bg-zinc-800/80 shadow-[4px_4px_8px_#bebebe,-4px_-4px_8px_#ffffff] dark:shadow-[4px_4px_8px_#1a1a1a,-4px_-4px_8px_#2e2e2e]", icon: "text-zinc-800 dark:text-white" },
     simple: { iconContainer: "bg-transparent", icon: "text-white" }
   };
 
   const isThemeActive = iconTheme !== 'none';
-  const isDefaultStyle = iconStyle === 'default' && !isThemeActive;
-
+  
   const currentStyle = isThemeActive ? styles.default : (styles[iconStyle] || styles.default);
 
   const iconContainerStyles: React.CSSProperties = {
     width: `${iconSize}px`,
     height: `${iconSize}px`,
+    borderRadius: `${iconRadius}px`,
+    backgroundColor: isThemeActive ? undefined : iconBackgroundColor,
   };
-  
-  if (isDefaultStyle) {
-    iconContainerStyles.backgroundColor = iconBackgroundColor;
-    iconContainerStyles.borderRadius = `${iconRadius}px`;
-  } else if (!isThemeActive) {
-    iconContainerStyles.borderRadius = (iconStyle === 'simple' ? '0px' : '16px');
-  }
 
   const iconProps = {
     style: {
-      color: isDefaultStyle ? iconColor : undefined,
+      color: isThemeActive ? undefined : iconColor,
       width: `${iconSize * 0.5}px`,
       height: `${iconSize * 0.5}px`,
     },
-    className: isDefaultStyle ? '' : currentStyle.icon,
+    className: currentStyle.icon,
   };
 
   const renderIconContent = () => {
@@ -114,8 +108,16 @@ const HomeScreen = () => {
   }
 
   return (
-    <div className="h-full app-container" onContextMenu={handleContextMenu}>
-        <div className="flex flex-col h-full justify-between pt-20 pb-8">
+    <div className="h-full" onContextMenu={handleContextMenu}>
+      <AnimatePresence>
+        <motion.div 
+            key="home-screen"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="flex flex-col h-full justify-between pt-20 pb-8"
+        >
           <div className="grid grid-cols-4 gap-y-6 px-4">
             {mainApps.map((app, i) => (
               <motion.div
@@ -148,7 +150,8 @@ const HomeScreen = () => {
                 ))}
               </motion.div>
           </div>
-        </div>
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 };

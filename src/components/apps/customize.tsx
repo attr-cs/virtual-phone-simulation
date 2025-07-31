@@ -14,6 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '../ui/button';
+import { motion } from 'framer-motion';
 
 const iconStyles: { id: IconStyle, name: string }[] = [
     { id: 'default', name: 'Default' },
@@ -39,26 +40,23 @@ const IconPreview = () => {
     } = usePhone();
 
     const styles = {
-        default: { iconContainer: "backdrop-blur-md", icon: "text-white" },
+        default: { iconContainer: "backdrop-blur-md", icon: "" },
         glass: { iconContainer: "backdrop-blur-lg border border-white/20 bg-white/10", icon: "text-white" },
         neumorphic: { iconContainer: "bg-zinc-200/80 dark:bg-zinc-800/80 shadow-[4px_4px_8px_#bebebe,-4px_-4px_8px_#ffffff] dark:shadow-[4px_4px_8px_#1a1a1a,-4px_-4px_8px_#2e2e2e]", icon: "text-zinc-800 dark:text-white" },
         simple: { iconContainer: "bg-transparent", icon: "text-white" }
-    }
+    };
     
     const isThemeActive = iconTheme !== 'none';
-    const isDefaultStyle = iconStyle === 'default' && !isThemeActive;
     
     const currentStyle = isThemeActive ? styles.default : (styles[iconStyle] || styles.default);
     
-    const iconFinalColor = isDefaultStyle ? iconColor : undefined;
-    const iconFinalBgColor = isDefaultStyle ? iconBackgroundColor : undefined;
     const finalIconRadius = isThemeActive ? '16px' : `${iconRadius}px`;
 
     const iconContainerStyles: React.CSSProperties = {
         width: `${iconSize}px`,
         height: `${iconSize}px`,
         borderRadius: finalIconRadius,
-        backgroundColor: iconFinalBgColor
+        backgroundColor: isThemeActive ? undefined : iconBackgroundColor,
     };
 
     let content;
@@ -66,7 +64,7 @@ const IconPreview = () => {
         const theme = iconThemes.find(t => t.id === iconTheme);
         content = (
             <div 
-                className={cn("flex items-center justify-center w-full h-full text-white font-bold text-xs bg-cover bg-center rounded-lg")}
+                className={cn("flex items-center justify-center w-full h-full text-white font-bold text-xs bg-cover bg-center")}
                 style={{ 
                     backgroundImage: `url(${theme?.preview})`,
                     backgroundSize: 'cover',
@@ -83,7 +81,7 @@ const IconPreview = () => {
                 <Smartphone 
                     className={cn(currentStyle.icon)}
                     style={{ 
-                        color: iconFinalColor,
+                        color: iconColor,
                         width: `${iconSize * 0.5}px`,
                         height: `${iconSize * 0.5}px`
                      }}
@@ -95,9 +93,9 @@ const IconPreview = () => {
     return (
         <Card className="bg-zinc-800 p-4 flex items-center justify-center bg-cover bg-center h-[200px]" style={{ backgroundImage: `url(https://picsum.photos/seed/1/390/844)` }}>
              <div className="flex flex-col items-center gap-1.5 text-center">
-                <div style={{ width: `${iconSize}px`, height: `${iconSize}px` }}>
+                <motion.div layout>
                     {content}
-                </div>
+                </motion.div>
                 <span className="text-white text-xs font-medium drop-shadow-md font-sans [text-shadow:0_1px_1px_rgba(0,0,0,0.4)]">Your App</span>
              </div>
         </Card>
@@ -120,10 +118,7 @@ const CustomizeApp = () => {
     const [activeTab, setActiveTab] = useState('wallpaper');
 
     const isThemeActive = iconTheme !== 'none';
-    const isDefaultStyle = iconStyle === 'default';
-
-    const areColorControlsDisabled = isThemeActive || !isDefaultStyle;
-    const areRadiusControlsDisabled = isThemeActive;
+    const areControlsDisabled = isThemeActive;
 
     const handleThemeSelection = (themeId: IconTheme) => {
         setIconTheme(themeId);
@@ -173,7 +168,13 @@ const CustomizeApp = () => {
     }
 
     return (
-        <div className="bg-background h-full flex flex-col font-sans app-container">
+        <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="bg-background h-full flex flex-col font-sans"
+        >
              <header className="p-4 pt-12 bg-background/80 backdrop-blur-sm border-b sticky top-0 z-10 flex items-center justify-between shrink-0">
                 <h1 className="text-xl font-headline font-bold">Customize</h1>
                 <button onClick={() => setApp('home')} className="p-1"><X size={20}/></button>
@@ -210,11 +211,11 @@ const CustomizeApp = () => {
                         <ScrollArea className="flex-1" hideScrollbar>
                             <div className="p-4 space-y-6">
                                 
-                                <div className="space-y-4">
+                                <div className={cn("space-y-4 transition-opacity", areControlsDisabled && "opacity-50 pointer-events-none")}>
                                     <Label className="text-base font-semibold">Icon Size</Label>
                                     <div className="space-y-2">
                                         <Label className="flex items-center gap-2 text-sm text-muted-foreground"><ArrowDownUp size={16} /> Size</Label>
-                                        <Slider value={[iconSize]} onValueChange={(v) => setIconSize(v[0])} min={40} max={80} step={2} />
+                                        <Slider value={[iconSize]} onValueChange={(v) => setIconSize(v[0])} min={40} max={80} step={2} disabled={areControlsDisabled} />
                                     </div>
                                 </div>
                                 
@@ -230,22 +231,22 @@ const CustomizeApp = () => {
                                     </div>
                                 </div>
 
-                                <div className={cn("space-y-4 transition-opacity", areColorControlsDisabled && "opacity-50 pointer-events-none")}>
-                                    <Label className="text-base font-semibold">Colors (Default Style Only)</Label>
+                                <div className={cn("space-y-4 transition-opacity", areControlsDisabled && "opacity-50 pointer-events-none")}>
+                                    <Label className="text-base font-semibold">Colors</Label>
                                     <div className="flex items-center gap-4">
                                         <Label htmlFor="icon-color" className="flex items-center gap-2 text-sm text-muted-foreground"><Palette size={16} /> Icon</Label>
-                                        <Input id="icon-color" type="color" value={iconColor} onChange={(e) => setIconColor(e.target.value)} className="w-16 h-8 p-0.5" disabled={areColorControlsDisabled} />
+                                        <Input id="icon-color" type="color" value={iconColor} onChange={(e) => setIconColor(e.target.value)} className="w-16 h-8 p-0.5" disabled={areControlsDisabled} />
                                     </div>
                                     <div className="flex items-center gap-4">
                                     <Label htmlFor="bg-color" className="flex items-center gap-2 text-sm text-muted-foreground"><Wallpaper size={16} /> Background</Label>
-                                    <Input id="bg-color" type="color" value={iconBackgroundColor} onChange={(e) => setIconBackgroundColor(e.target.value)} className="w-16 h-8 p-0.5" disabled={areColorControlsDisabled} />
+                                    <Input id="bg-color" type="color" value={iconBackgroundColor} onChange={(e) => setIconBackgroundColor(e.target.value)} className="w-16 h-8 p-0.5" disabled={areControlsDisabled} />
                                     </div>
                                 </div>
 
-                                <div className={cn("space-y-2 transition-opacity", areRadiusControlsDisabled && "opacity-50 pointer-events-none")}>
+                                <div className={cn("space-y-2 transition-opacity", areControlsDisabled && "opacity-50 pointer-events-none")}>
                                     <Label className="text-base font-semibold">Style Controls</Label>
                                     <Label className="flex items-center gap-2 text-sm text-muted-foreground"><CornerLeftUp size={16} /> Corner Radius</Label>
-                                    <Slider value={[iconRadius]} onValueChange={(v) => setIconRadius(v[0])} min={0} max={40} step={2} disabled={areRadiusControlsDisabled} />
+                                    <Slider value={[iconRadius]} onValueChange={(v) => setIconRadius(v[0])} min={0} max={40} step={2} disabled={areControlsDisabled} />
                                 </div>
 
                                 <div className="space-y-4">
@@ -265,7 +266,7 @@ const CustomizeApp = () => {
                     </TabsContent>
                 </Tabs>
             </div>
-        </div>
+        </motion.div>
     )
 }
 
