@@ -9,7 +9,14 @@ import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 
 const AppIcon = ({ app }: { app: AppConfig }) => {
-  const { setApp, iconStyle, iconColor } = usePhone();
+  const { 
+    setApp, 
+    iconStyle, 
+    iconColor,
+    iconBackgroundColor,
+    iconSize,
+    iconRadius 
+  } = usePhone();
   const { toast } = useToast();
   const Icon = app.icon;
 
@@ -26,11 +33,11 @@ const AppIcon = ({ app }: { app: AppConfig }) => {
 
   const styles = {
     default: {
-      iconContainer: "bg-white/30 backdrop-blur-md",
+      iconContainer: "backdrop-blur-md",
       icon: "text-white"
     },
     glass: {
-      iconContainer: "bg-white/10 backdrop-blur-lg border border-white/20",
+      iconContainer: "backdrop-blur-lg border border-white/20",
       icon: "text-white"
     },
     neumorphic: {
@@ -45,6 +52,9 @@ const AppIcon = ({ app }: { app: AppConfig }) => {
 
   const currentStyle = styles[iconStyle] || styles.default;
   const iconFinalColor = iconStyle === 'neumorphic' ? currentStyle.icon : iconColor;
+  
+  const iconBg = iconStyle === 'default' || iconStyle === 'glass' ? iconBackgroundColor : 'transparent';
+  const simpleBg = iconStyle === 'simple' ? iconColor + '40' : 'transparent';
 
   return (
     <motion.button 
@@ -55,14 +65,22 @@ const AppIcon = ({ app }: { app: AppConfig }) => {
     >
       <div 
         className={cn(
-          "w-14 h-14 rounded-2xl flex items-center justify-center shadow-md transition-all",
+          "flex items-center justify-center shadow-md transition-all",
           currentStyle.iconContainer
        )}
-       style={iconStyle === 'simple' ? { backgroundColor: iconColor + '40' } : {}}
+       style={{ 
+         width: `${iconSize}px`,
+         height: `${iconSize}px`,
+         borderRadius: `${iconRadius}px`,
+         backgroundColor: iconStyle === 'simple' ? simpleBg : iconBg,
+        }}
       >
         <Icon 
-            style={{ color: iconFinalColor }}
-            size={28} 
+            style={{ 
+              color: iconFinalColor,
+              width: `${iconSize * 0.5}px`,
+              height: `${iconSize * 0.5}px`,
+            }}
         />
       </div>
       <span className="text-white text-xs font-medium drop-shadow-md font-sans [text-shadow:0_1px_1px_rgba(0,0,0,0.4)]">{app.name}</span>

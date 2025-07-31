@@ -18,6 +18,12 @@ interface PhoneContextType {
   setIconStyle: (style: IconStyle) => void;
   iconColor: string;
   setIconColor: (color: string) => void;
+  iconBackgroundColor: string;
+  setIconBackgroundColor: (color: string) => void;
+  iconSize: number;
+  setIconSize: (size: number) => void;
+  iconRadius: number;
+  setIconRadius: (radius: number) => void;
 }
 
 const PhoneContext = createContext<PhoneContextType | undefined>(undefined);
@@ -28,6 +34,9 @@ export const PhoneProvider = ({ children }: { children: ReactNode }) => {
   const [brightness, setBrightness] = useState(100);
   const [iconStyle, setIconStyle] = useState<IconStyle>('default');
   const [iconColor, setIconColor] = useState('#ffffff');
+  const [iconBackgroundColor, setIconBackgroundColor] = useState('rgba(255, 255, 255, 0.3)');
+  const [iconSize, setIconSize] = useState(56); // Corresponds to w-14 h-14
+  const [iconRadius, setIconRadius] = useState(16); // Corresponds to rounded-2xl
 
 
   const value = {
@@ -41,6 +50,12 @@ export const PhoneProvider = ({ children }: { children: ReactNode }) => {
     setIconStyle,
     iconColor,
     setIconColor,
+    iconBackgroundColor,
+    setIconBackgroundColor,
+    iconSize,
+    setIconSize,
+    iconRadius,
+    setIconRadius,
   };
 
   return <PhoneContext.Provider value={value}>{children}</PhoneContext.Provider>;
