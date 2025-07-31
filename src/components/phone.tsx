@@ -82,22 +82,22 @@ const VolumeIndicator = ({ volume, isVisible }: { volume: number, isVisible: boo
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: -20, opacity: 0, transition: { duration: 0.4, ease: 'easeOut', delay: 1.5 } }}
                     transition={{ type: 'spring', stiffness: 400, damping: 40 }}
-                    className="absolute top-0 left-0 right-0 z-30 p-1"
+                    className="absolute top-0 left-0 right-0 z-30"
                 >
-                    <div className="h-2.5 rounded-t-full bg-black/40 backdrop-blur-sm shadow-lg overflow-hidden">
+                    <div className="h-5 bg-black/40 backdrop-blur-sm shadow-lg overflow-hidden">
                         <motion.div
-                            className="h-full bg-gradient-to-r from-blue-500 via-cyan-400 to-indigo-500"
+                            className="h-full bg-gradient-to-r from-blue-800 via-blue-600 to-indigo-800"
                             style={{ width: `${volume}%` }}
                             transition={{ ease: 'easeOut', duration: 0.3 }}
                         >
                             <motion.div
                                 className="h-full w-full opacity-40"
                                 style={{
-                                    backgroundImage: 'linear-gradient(45deg, rgba(255,255,255,0.6) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0.6) 75%, transparent 75%, transparent)',
+                                    backgroundImage: 'radial-gradient(circle, white 0.5px, transparent 1px)',
                                     backgroundSize: '30px 30px',
                                 }}
-                                animate={{ backgroundPositionX: ['0px', '30px'] }}
-                                transition={{ repeat: Infinity, duration: 0.7, ease: 'linear' }}
+                                animate={{ backgroundPosition: ['0 0', '30px 30px'] }}
+                                transition={{ repeat: Infinity, duration: 2, ease: 'linear' }}
                             />
                         </motion.div>
                     </div>
@@ -158,11 +158,11 @@ const PhoneContent = () => {
 
   return (
     <div className="relative w-full h-full bg-zinc-800 rounded-[40px] shadow-2xl overflow-hidden border-4 border-black">
-        <AnimatePresence>
-            {isLocked && <LockScreen onUnlock={() => setIsLocked(false)} />}
-        </AnimatePresence>
       <VolumeIndicator volume={volume} isVisible={showVolume} />
       <div className="relative w-full h-full" style={{ filter: `brightness(${brightness}%)`}}>
+            <AnimatePresence>
+                {isLocked && <LockScreen onUnlock={() => setIsLocked(false)} />}
+            </AnimatePresence>
             <StatusBar 
                 onDragStart={() => {}} 
                 onDrag={handleDrag} 
