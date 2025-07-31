@@ -58,7 +58,7 @@ const StatusBar = ({ onDragStart, onDrag, onDragEnd }: { onDragStart: any, onDra
 
   return (
     <motion.div 
-        className="absolute top-0 left-0 right-0 h-10 px-4 flex items-center justify-between text-sm font-medium text-white z-20 font-sans cursor-grab active:cursor-grabbing"
+        className="absolute top-0 left-0 right-0 h-10 px-4 flex items-center justify-between text-sm font-medium text-white z-20 font-sans cursor-grab active:cursor-grabbing [text-shadow:0_1px_2px_rgba(0,0,0,0.5)]"
         onPanStart={onDragStart}
         onPan={onDrag}
         onPanEnd={onDragEnd}
@@ -107,17 +107,19 @@ const PhoneContent = () => {
             {CurrentApp ? <CurrentApp /> : <p>This app is not available.</p>}
           </div>
         </div>
-        <div className="absolute bottom-0 left-0 right-0 h-16 flex items-center justify-center">
-           <Button 
-              variant="ghost" 
-              size="icon" 
-              className="bg-white/20 hover:bg-white/30 text-white rounded-full h-12 w-12 backdrop-blur-sm"
-              onClick={() => setApp('home')}
-              aria-label="Home"
-            >
-              <Home size={24} />
-           </Button>
-        </div>
+        {app !== 'home' && (
+            <div className="absolute bottom-0 left-0 right-0 h-16 flex items-center justify-center">
+               <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="bg-white/20 hover:bg-white/30 text-white rounded-full h-12 w-12 backdrop-blur-sm"
+                  onClick={() => setApp('home')}
+                  aria-label="Home"
+                >
+                  <Home size={24} />
+               </Button>
+            </div>
+        )}
       </div>
        <ControlCenter isOpen={isControlCenterOpen} setIsOpen={setControlCenterOpen} />
     </div>
