@@ -30,7 +30,6 @@ const ThemedIconWrapper = ({ children, iconSize, iconRadius }: { children: React
                 </div>
             );
         case 'tech-scifi':
-            const hexPath = "M30.05 3.35a2 2 0 0 1 1.73 1L38.63 18a2 2 0 0 1 0 2l-6.85 13.65a2 2 0 0 1-1.73 1H8.15a2 2 0 0 1-1.73-1L-.43 20a2 2 0 0 1 0-2L6.42 4.35a2 2 0 0 1 1.73-1h21.9z";
             return (
                  <div className="relative flex items-center justify-center w-full h-full bg-zinc-900" style={{ clipPath: `url(#hexagon-clip-${iconSize})` }}>
                      <svg className="absolute w-0 h-0">
@@ -90,7 +89,7 @@ const AppIcon = ({ app }: { app: AppConfig }) => {
     width: `${iconSize}px`,
     height: `${iconSize}px`,
     borderRadius: `${iconRadius}px`,
-    backgroundColor: iconBackgroundColor,
+    backgroundColor: isThemeActive ? 'transparent' : iconBackgroundColor,
   };
   
   const iconProps = {
@@ -100,7 +99,7 @@ const AppIcon = ({ app }: { app: AppConfig }) => {
       height: `${iconSize * 0.5}px`,
       filter: iconTheme === 'skeuomorphic' ? 'drop-shadow(1px 1px 1px rgba(0,0,0,0.4))' : 'none'
     },
-    className: cn(!isThemeActive && currentStyle.icon, 'relative z-10'),
+    className: cn(isThemeActive ? '' : currentStyle.icon, 'relative z-10'),
     strokeWidth: iconTheme === 'pixel' ? 0 : 2,
     fill: iconTheme === 'pixel' ? 'currentColor' : 'none'
   };
@@ -118,9 +117,20 @@ const AppIcon = ({ app }: { app: AppConfig }) => {
             "flex items-center justify-center shadow-md transition-all w-full h-full",
             currentStyle.iconContainer
             )}
-            style={iconContainerStyles}
+            style={{
+                ...iconContainerStyles,
+                 backgroundColor: iconBackgroundColor,
+                 borderRadius: `${iconRadius}px`,
+            }}
         >
-            {iconEl}
+            <Icon 
+                className={cn(currentStyle.icon)}
+                style={{ 
+                    color: iconColor,
+                    width: `${iconSize * 0.5}px`,
+                    height: `${iconSize * 0.5}px`
+                 }}
+            />
         </div>
     )
   }
@@ -134,7 +144,9 @@ const AppIcon = ({ app }: { app: AppConfig }) => {
         whileHover={{ scale: 1.1 }}
     >
       <div style={{ width: `${iconSize}px`, height: `${iconSize}px`}}>
-        {renderIconContent()}
+        <div style={iconContainerStyles} className="flex items-center justify-center">
+            {renderIconContent()}
+        </div>
       </div>
       <span className="text-white text-xs font-medium drop-shadow-md font-sans [text-shadow:0_1px_1px_rgba(0,0,0,0.4)]">{app.name}</span>
     </motion.button>
