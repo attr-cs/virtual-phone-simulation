@@ -9,6 +9,7 @@ import {
   Mic,
   Gamepad2,
   Component,
+  Wallpaper,
   type LucideProps
 } from 'lucide-react';
 
