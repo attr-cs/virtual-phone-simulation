@@ -74,51 +74,23 @@ const StatusBar = ({ onDragStart, onDrag, onDragEnd }: { onDragStart: any, onDra
 };
 
 const VolumeIndicator = ({ volume, isVisible }: { volume: number, isVisible: boolean }) => {
-    const particleCount = 20;
-
     return (
         <AnimatePresence>
             {isVisible && (
                 <motion.div
-                    initial={{ y: -50, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    exit={{ y: -50, opacity: 0, transition: { duration: 0.4, ease: 'easeOut', delay: 1.5 } }}
+                    initial={{ x: -40, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    exit={{ x: -40, opacity: 0, transition: { duration: 0.4, ease: 'easeOut', delay: 1.5 } }}
                     transition={{ type: 'spring', stiffness: 400, damping: 40 }}
-                    className="absolute top-0 left-0 right-0 z-30 overflow-hidden rounded-t-[40px]"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 z-30"
                 >
-                    <div className="h-10 bg-black/50 backdrop-blur-sm shadow-lg overflow-hidden">
-                        <motion.div
-                            className="h-full bg-gradient-to-r from-blue-900 via-blue-700 to-indigo-900"
-                            style={{ width: `${volume}%` }}
+                    <div className="w-8 h-40 bg-white/80 backdrop-blur-md rounded-full p-1.5 flex flex-col-reverse">
+                       <motion.div
+                            className="w-full bg-white rounded-full"
+                            initial={{ height: `${volume}%`}}
+                            animate={{ height: `${volume}%`}}
                             transition={{ ease: 'easeOut', duration: 0.3 }}
-                        >
-                            <div className="relative h-full w-full overflow-hidden">
-                                {Array.from({ length: particleCount }).map((_, i) => (
-                                    <motion.div
-                                        key={i}
-                                        className="absolute rounded-full bg-white/50"
-                                        style={{
-                                            height: `${Math.random() * 2 + 1}px`,
-                                            width: `${Math.random() * 2 + 1}px`,
-                                            top: `${Math.random() * 100}%`,
-                                            left: `${Math.random() * 100}%`,
-                                        }}
-                                        animate={{
-                                            x: [0, (Math.random() - 0.5) * 40, 0],
-                                            y: [0, (Math.random() - 0.5) * 40, 0],
-                                            opacity: [0, 0.8, 0],
-                                        }}
-                                        transition={{
-                                            duration: Math.random() * 5 + 5,
-                                            repeat: Infinity,
-                                            repeatType: "loop",
-                                            ease: "easeInOut",
-                                            delay: Math.random() * 2,
-                                        }}
-                                    />
-                                ))}
-                            </div>
-                        </motion.div>
+                        />
                     </div>
                 </motion.div>
             )}
@@ -262,5 +234,3 @@ const PhoneContentWithButtons = () => {
 }
 
 export default Phone;
-
-    
