@@ -5,11 +5,12 @@ import React from 'react';
 import Image from 'next/image';
 import { usePhone, IconStyle } from '@/contexts/phone-context';
 import { wallpapers } from '@/config/apps';
-import { X, Wallpaper, Sparkles, Palette } from 'lucide-react';
+import { X, Wallpaper, Sparkles, Palette, Smartphone } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { Card } from '@/components/ui/card';
 
 const iconStyles: { id: IconStyle, name: string }[] = [
     { id: 'default', name: 'Default' },
@@ -17,6 +18,32 @@ const iconStyles: { id: IconStyle, name: string }[] = [
     { id: 'neumorphic', name: 'Neumorphic' },
     { id: 'simple', name: 'Simple' },
 ]
+
+const IconPreview = () => {
+    const { iconStyle, iconColor } = usePhone();
+    const styles = {
+        default: { iconContainer: "bg-white/30 backdrop-blur-md", icon: "text-white" },
+        glass: { iconContainer: "bg-white/10 backdrop-blur-lg border border-white/20", icon: "text-white" },
+        neumorphic: { iconContainer: "bg-zinc-200/50 dark:bg-zinc-800/50 shadow-[4px_4px_8px_#bebebe,-4px_-4px_8px_#ffffff] dark:shadow-[4px_4px_8px_#1a1a1a,-4px_-4px_8px_#2e2e2e]", icon: "text-zinc-800 dark:text-white" },
+        simple: { iconContainer: "bg-transparent", icon: "text-white" }
+    }
+    const currentStyle = styles[iconStyle] || styles.default;
+    const iconFinalColor = iconStyle === 'neumorphic' ? currentStyle.icon : iconColor;
+
+    return (
+        <Card className="bg-zinc-800 p-4" style={{ backgroundImage: `url(https://picsum.photos/seed/1/390/844)` }}>
+             <div className="flex flex-col items-center gap-1.5 text-center">
+                <div 
+                    className={cn("w-14 h-14 rounded-2xl flex items-center justify-center shadow-md", currentStyle.iconContainer)}
+                    style={iconStyle === 'simple' ? { backgroundColor: iconColor + '40' } : {}}
+                >
+                    <Smartphone style={{ color: iconFinalColor }} size={28} />
+                </div>
+                <span className="text-white text-xs font-medium drop-shadow-md font-sans [text-shadow:0_1px_1px_rgba(0,0,0,0.4)]">Your App</span>
+             </div>
+        </Card>
+    )
+}
 
 const CustomizeApp = () => {
     const { 
@@ -27,7 +54,7 @@ const CustomizeApp = () => {
     } = usePhone();
 
     return (
-        <div className="bg-background h-full flex flex-col font-sans">
+        <div className="bg-background h-full flex flex-col font-sans app-container">
              <header className="p-4 pt-12 bg-background/80 backdrop-blur-sm border-b sticky top-0 z-10 flex items-center justify-between">
                 <h1 className="text-xl font-headline font-bold">Customize</h1>
                 <button onClick={() => setApp('home')} className="p-1"><X size={20}/></button>
@@ -55,6 +82,11 @@ const CustomizeApp = () => {
                         </div>
                     </TabsContent>
                     <TabsContent value="icons" className="flex-1 overflow-y-auto p-4 space-y-6">
+                        <div>
+                            <Label className="text-base font-semibold mb-2 block">Live Preview</Label>
+                            <IconPreview />
+                        </div>
+
                         <div className="space-y-2">
                              <Label className="text-base font-semibold">Icon Color</Label>
                              <div className="flex items-center gap-4">

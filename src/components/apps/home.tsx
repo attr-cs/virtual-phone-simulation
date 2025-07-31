@@ -81,7 +81,7 @@ const HomeScreen = () => {
   }
 
   return (
-    <div className="h-full" onContextMenu={handleContextMenu}>
+    <div className="h-full app-container" onContextMenu={handleContextMenu}>
         <div className="flex flex-col h-full justify-between pt-20 pb-8">
           <div className="grid grid-cols-4 gap-y-6 px-4">
             {mainApps.map((app, i) => (
