@@ -50,36 +50,38 @@ const IconPreview = () => {
     
     const currentStyle = isThemeActive ? styles.default : (styles[iconStyle] || styles.default);
     
-    const iconFinalColor = isDefaultStyle ? iconColor : currentStyle.icon;
-    
+    const iconFinalColor = isDefaultStyle ? iconColor : undefined;
+    const iconFinalBgColor = isDefaultStyle ? iconBackgroundColor : undefined;
+    const finalIconRadius = isThemeActive ? '16px' : `${iconRadius}px`;
+
     const iconContainerStyles: React.CSSProperties = {
         width: `${iconSize}px`,
         height: `${iconSize}px`,
-        borderRadius: `${iconRadius}px`,
+        borderRadius: finalIconRadius,
+        backgroundColor: iconFinalBgColor
     };
 
-    if (isDefaultStyle) {
-        iconContainerStyles.backgroundColor = iconBackgroundColor;
-    }
-    
     let content;
     if (isThemeActive) {
-        let themeName = iconTheme.charAt(0).toUpperCase() + iconTheme.slice(1);
-        content = <div className={cn("flex items-center justify-center w-full h-full text-white font-bold text-xs bg-cover bg-center rounded-lg", 
-            iconTheme === 'minimalist' && "bg-zinc-100 text-black",
-            iconTheme === 'skeuomorphic' && "bg-amber-300 text-black shadow-inner",
-            iconTheme === 'pixel' && "bg-purple-500 text-white"
-        )} style={{ borderRadius: `${iconRadius}px`}}>{themeName}</div>
+        const theme = iconThemes.find(t => t.id === iconTheme);
+        content = (
+            <div 
+                className={cn("flex items-center justify-center w-full h-full text-white font-bold text-xs bg-cover bg-center rounded-lg")}
+                style={{ 
+                    backgroundImage: `url(${theme?.preview})`,
+                    backgroundSize: 'cover',
+                    borderRadius: `${iconRadius}px`
+                }}
+            />
+        )
     } else {
          content = (
             <div 
                 className={cn("flex items-center justify-center shadow-md transition-all w-full h-full", currentStyle.iconContainer)}
-                style={{
-                    ...iconContainerStyles,
-                    borderRadius: (iconStyle === 'default' && !isThemeActive) ? `${iconRadius}px` : '16px'
-                }}
+                style={iconContainerStyles}
             >
                 <Smartphone 
+                    className={cn(currentStyle.icon)}
                     style={{ 
                         color: iconFinalColor,
                         width: `${iconSize * 0.5}px`,
@@ -91,7 +93,7 @@ const IconPreview = () => {
     }
 
     return (
-        <Card className="bg-zinc-800 p-4 flex items-center justify-center bg-cover bg-center" style={{ backgroundImage: `url(https://picsum.photos/seed/1/390/844)` }}>
+        <Card className="bg-zinc-800 p-4 flex items-center justify-center bg-cover bg-center h-[200px]" style={{ backgroundImage: `url(https://picsum.photos/seed/1/390/844)` }}>
              <div className="flex flex-col items-center gap-1.5 text-center">
                 <div style={{ width: `${iconSize}px`, height: `${iconSize}px` }}>
                     {content}
@@ -115,11 +117,19 @@ const CustomizeApp = () => {
     } = usePhone();
 
     const [view, setView] = useState<'main' | 'themes'>('main');
+    const [activeTab, setActiveTab] = useState('wallpaper');
 
     const isThemeActive = iconTheme !== 'none';
     const isDefaultStyle = iconStyle === 'default';
-    const areControlsDisabled = isThemeActive || !isDefaultStyle;
 
+    const areColorControlsDisabled = isThemeActive || !isDefaultStyle;
+    const areRadiusControlsDisabled = isThemeActive;
+
+    const handleThemeSelection = (themeId: IconTheme) => {
+        setIconTheme(themeId);
+        setView('main');
+        setActiveTab('icons');
+    }
 
     if (view === 'themes') {
         return (
@@ -132,7 +142,7 @@ const CustomizeApp = () => {
                     <div className="p-4 grid grid-cols-2 gap-4">
                         <Card 
                             className={cn("overflow-hidden cursor-pointer transition-all", 'none' === iconTheme ? 'border-primary ring-2 ring-primary scale-105' : 'border-border')}
-                             onClick={() => { setIconTheme('none'); setView('main'); }}
+                             onClick={() => handleThemeSelection('none')}
                         >
                             <CardHeader>
                                 <CardTitle className="text-lg">None</CardTitle>
@@ -145,7 +155,7 @@ const CustomizeApp = () => {
                              <Card 
                                 key={theme.id} 
                                 className={cn("overflow-hidden cursor-pointer transition-all", theme.id === iconTheme ? 'border-primary ring-2 ring-primary scale-105' : 'border-border')}
-                                onClick={() => { setIconTheme(theme.id); setView('main'); }}
+                                onClick={() => handleThemeSelection(theme.id)}
                             >
                                 <CardHeader className="flex flex-row items-center gap-4 space-y-0">
                                      <Image src={theme.preview} width={50} height={50} alt={theme.name} className="rounded-lg" data-ai-hint="icon theme preview" />
@@ -169,7 +179,7 @@ const CustomizeApp = () => {
                 <button onClick={() => setApp('home')} className="p-1"><X size={20}/></button>
             </header>
              <div className="flex-1 flex flex-col min-h-0">
-                 <Tabs defaultValue="wallpaper" className="h-full flex flex-col">
+                 <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
                     <TabsList className="w-full rounded-none bg-background z-10 shrink-0 grid grid-cols-2">
                         <TabsTrigger value="wallpaper" className="flex-1 gap-2"><Wallpaper size={16}/> Wallpaper</TabsTrigger>
                         <TabsTrigger value="icons" className="flex-1 gap-2"><Sparkles size={16}/> Icons</TabsTrigger>
@@ -192,14 +202,14 @@ const CustomizeApp = () => {
                             </div>
                         </ScrollArea>
                     </TabsContent>
-                    <TabsContent value="icons" className="flex-1 min-h-0">
-                        <ScrollArea className="h-full" hideScrollbar>
+                    <TabsContent value="icons" className="flex-1 min-h-0 flex flex-col">
+                        <div className="sticky top-0 bg-background/80 backdrop-blur-sm py-4 z-10 -mx-4 px-4 border-b">
+                            <Label className="text-base font-semibold mb-2 block px-4">Live Preview</Label>
+                            <IconPreview />
+                        </div>
+                        <ScrollArea className="flex-1" hideScrollbar>
                             <div className="p-4 space-y-6">
-                                <div className="sticky top-0 bg-background/80 backdrop-blur-sm py-4 z-10 -mx-4 px-4">
-                                    <Label className="text-base font-semibold mb-2 block">Live Preview</Label>
-                                    <IconPreview />
-                                </div>
-
+                                
                                 <div className="space-y-4">
                                     <Label className="text-base font-semibold">Icon Size</Label>
                                     <div className="space-y-2">
@@ -220,21 +230,22 @@ const CustomizeApp = () => {
                                     </div>
                                 </div>
 
-                                <div className={cn("space-y-4 transition-opacity", areControlsDisabled && "opacity-50 pointer-events-none")}>
-                                    <Label className="text-base font-semibold">Colors</Label>
+                                <div className={cn("space-y-4 transition-opacity", areColorControlsDisabled && "opacity-50 pointer-events-none")}>
+                                    <Label className="text-base font-semibold">Colors (Default Style Only)</Label>
                                     <div className="flex items-center gap-4">
                                         <Label htmlFor="icon-color" className="flex items-center gap-2 text-sm text-muted-foreground"><Palette size={16} /> Icon</Label>
-                                        <Input id="icon-color" type="color" value={iconColor} onChange={(e) => setIconColor(e.target.value)} className="w-16 h-8 p-0.5" disabled={areControlsDisabled} />
+                                        <Input id="icon-color" type="color" value={iconColor} onChange={(e) => setIconColor(e.target.value)} className="w-16 h-8 p-0.5" disabled={areColorControlsDisabled} />
                                     </div>
                                     <div className="flex items-center gap-4">
                                     <Label htmlFor="bg-color" className="flex items-center gap-2 text-sm text-muted-foreground"><Wallpaper size={16} /> Background</Label>
-                                    <Input id="bg-color" type="color" value={iconBackgroundColor} onChange={(e) => setIconBackgroundColor(e.target.value)} className="w-16 h-8 p-0.5" disabled={areControlsDisabled} />
+                                    <Input id="bg-color" type="color" value={iconBackgroundColor} onChange={(e) => setIconBackgroundColor(e.target.value)} className="w-16 h-8 p-0.5" disabled={areColorControlsDisabled} />
                                     </div>
                                 </div>
 
-                                <div className={cn("space-y-2 transition-opacity", areControlsDisabled && "opacity-50 pointer-events-none")}>
+                                <div className={cn("space-y-2 transition-opacity", areRadiusControlsDisabled && "opacity-50 pointer-events-none")}>
+                                    <Label className="text-base font-semibold">Style Controls</Label>
                                     <Label className="flex items-center gap-2 text-sm text-muted-foreground"><CornerLeftUp size={16} /> Corner Radius</Label>
-                                    <Slider value={[iconRadius]} onValueChange={(v) => setIconRadius(v[0])} min={0} max={40} step={2} disabled={areControlsDisabled} />
+                                    <Slider value={[iconRadius]} onValueChange={(v) => setIconRadius(v[0])} min={0} max={40} step={2} disabled={areRadiusControlsDisabled} />
                                 </div>
 
                                 <div className="space-y-4">
