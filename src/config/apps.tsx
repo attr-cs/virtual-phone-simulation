@@ -18,6 +18,7 @@ import GalleryApp from '@/components/apps/gallery';
 import CameraApp from '@/components/apps/camera';
 import MessagesApp from '@/components/apps/messages';
 import SettingsApp from '@/components/apps/settings';
+import BrowserApp from '@/components/apps/browser';
 
 export const appIds = ['home', 'calculator', 'gallery', 'camera', 'messages', 'settings', 'browser', 'files', 'voice-memos', 'games'] as const;
 export type AppId = (typeof appIds)[number];
@@ -38,7 +39,7 @@ export const apps: AppConfig[] = [
   { id: 'camera', name: 'Camera', icon: Camera, component: CameraApp },
   { id: 'messages', name: 'Messages', icon: MessageSquare, component: MessagesApp, inDock: true },
   { id: 'settings', name: 'Settings', icon: Settings, component: SettingsApp },
-  { id: 'browser', name: 'Browser', icon: Globe, component: null, inDock: true },
+  { id: 'browser', name: 'Browser', icon: Globe, component: BrowserApp, inDock: true },
   { id: 'files', name: 'Files', icon: Folder, component: null },
   { id: 'voice-memos', name: 'Voice Memos', icon: Mic, component: null },
   { id: 'games', name: 'Games', icon: Gamepad2, component: null },
