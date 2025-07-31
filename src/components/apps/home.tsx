@@ -32,29 +32,34 @@ const AppIcon = ({ app }: { app: AppConfig }) => {
   };
 
   const styles = {
-    default: {
-      iconContainer: "backdrop-blur-md",
-      icon: "text-white"
-    },
-    glass: {
-      iconContainer: "backdrop-blur-lg border border-white/20",
-      icon: "text-white"
-    },
-    neumorphic: {
-      iconContainer: "bg-zinc-200/50 dark:bg-zinc-800/50 shadow-[4px_4px_8px_#bebebe,-4px_-4px_8px_#ffffff] dark:shadow-[4px_4px_8px_#1a1a1a,-4px_-4px_8px_#2e2e2e]",
-      icon: "text-zinc-800 dark:text-white"
-    },
-    simple: {
-      iconContainer: "bg-transparent",
-      icon: "text-white"
-    }
-  }
+    default: { iconContainer: "backdrop-blur-md", icon: "" },
+    glass: { iconContainer: "backdrop-blur-lg border border-white/20 bg-white/10", icon: "text-white" },
+    neumorphic: { iconContainer: "bg-zinc-200/80 dark:bg-zinc-800/80 shadow-[4px_4px_8px_#bebebe,-4px_-4px_8px_#ffffff] dark:shadow-[4px_4px_8px_#1a1a1a,-4px_-4px_8px_#2e2e2e]", icon: "text-zinc-800 dark:text-white" },
+    simple: { iconContainer: "bg-transparent", icon: "text-white" }
+  };
 
   const currentStyle = styles[iconStyle] || styles.default;
-  const iconFinalColor = iconStyle === 'neumorphic' ? currentStyle.icon : iconColor;
+  const isDefaultStyle = iconStyle === 'default';
+
+  const iconContainerStyles: React.CSSProperties = {
+    width: `${iconSize}px`,
+    height: `${iconSize}px`,
+    borderRadius: isDefaultStyle ? `${iconRadius}px` : (iconStyle === 'simple' ? '0px' : '16px'),
+  };
   
-  const iconBg = iconStyle === 'default' || iconStyle === 'glass' ? iconBackgroundColor : 'transparent';
-  const simpleBg = iconStyle === 'simple' ? iconColor + '40' : 'transparent';
+  if (isDefaultStyle) {
+    iconContainerStyles.backgroundColor = iconBackgroundColor;
+  }
+  
+  const iconProps = {
+    style: {
+      color: isDefaultStyle ? iconColor : undefined,
+      width: `${iconSize * 0.5}px`,
+      height: `${iconSize * 0.5}px`,
+    },
+    className: isDefaultStyle ? '' : currentStyle.icon,
+  };
+
 
   return (
     <motion.button 
@@ -68,20 +73,9 @@ const AppIcon = ({ app }: { app: AppConfig }) => {
           "flex items-center justify-center shadow-md transition-all",
           currentStyle.iconContainer
        )}
-       style={{ 
-         width: `${iconSize}px`,
-         height: `${iconSize}px`,
-         borderRadius: `${iconRadius}px`,
-         backgroundColor: iconStyle === 'simple' ? simpleBg : iconBg,
-        }}
+       style={iconContainerStyles}
       >
-        <Icon 
-            style={{ 
-              color: iconFinalColor,
-              width: `${iconSize * 0.5}px`,
-              height: `${iconSize * 0.5}px`,
-            }}
-        />
+        <Icon {...iconProps} />
       </div>
       <span className="text-white text-xs font-medium drop-shadow-md font-sans [text-shadow:0_1px_1px_rgba(0,0,0,0.4)]">{app.name}</span>
     </motion.button>
