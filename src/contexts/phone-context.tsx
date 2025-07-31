@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { createContext, useState, useContext, ReactNode } from 'react';
+import React, { createContext, useState, useContext, ReactNode, useCallback } from 'react';
 import type { AppId } from '@/config/apps';
 import { wallpapers } from '@/config/apps';
 
@@ -13,9 +13,9 @@ interface PhoneContextType {
   brightness: number;
   setBrightness: (level: number) => void;
   volume: number;
-  setVolume: (level: number) => void;
+  setVolume: React.Dispatch<React.SetStateAction<number>>;
   isLocked: boolean;
-  setIsLocked: (locked: boolean) => void;
+  setIsLocked: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const PhoneContext = createContext<PhoneContextType | undefined>(undefined);
@@ -26,7 +26,6 @@ export const PhoneProvider = ({ children }: { children: ReactNode }) => {
   const [brightness, setBrightness] = useState(100);
   const [volume, setVolume] = useState(50);
   const [isLocked, setIsLocked] = useState(false);
-
 
   const value = {
     app: currentApp,
@@ -51,3 +50,5 @@ export const usePhone = () => {
   }
   return context;
 };
+
+    
