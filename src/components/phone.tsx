@@ -84,7 +84,7 @@ const VolumeIndicator = ({ volume, isVisible }: { volume: number, isVisible: boo
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: -50, opacity: 0, transition: { duration: 0.4, ease: 'easeOut', delay: 1.5 } }}
                     transition={{ type: 'spring', stiffness: 400, damping: 40 }}
-                    className="absolute top-0 left-0 right-0 z-30 overflow-hidden"
+                    className="absolute top-0 left-0 right-0 z-30 overflow-hidden rounded-t-[40px]"
                 >
                     <div className="h-10 bg-black/50 backdrop-blur-sm shadow-lg overflow-hidden">
                         <motion.div
@@ -219,7 +219,7 @@ const PhoneContent = () => {
 
 const SideButton = ({ className, ...props }: React.ComponentProps<typeof motion.button>) => (
     <motion.button 
-        className={cn("bg-zinc-600 rounded-md outline-none focus:outline-none", className)}
+        className={cn("bg-zinc-600 rounded-md outline-none focus:outline-none focus-visible:outline-none", className)}
         whileTap={{ scale: 0.85, x: -2, backgroundColor: '#A1A1AA' }}
         transition={{ duration: 0.1, ease: "easeOut" }}
         {...props}
@@ -262,3 +262,5 @@ const PhoneContentWithButtons = () => {
 }
 
 export default Phone;
+
+    
