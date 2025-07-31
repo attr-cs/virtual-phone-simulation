@@ -8,8 +8,10 @@ import { Wifi, BatteryFull, BatteryMedium, BatteryLow, Signal, SignalLow, Signal
 import { Button } from '@/components/ui/button';
 import { Home } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import ControlCenter from '@/components/control-center';
+import { motion, PanInfo } from 'framer-motion';
 
-const StatusBar = () => {
+const StatusBar = ({ onDragStart, onDrag, onDragEnd }: { onDragStart: any, onDrag: any, onDragEnd: any }) => {
   const [time, setTime] = useState('');
   const [network, setNetwork] = useState({ signal: 3, speed: '1.2MB' });
   const [battery, setBattery] = useState(100);
@@ -55,7 +57,12 @@ const StatusBar = () => {
   }
 
   return (
-    <div className="absolute top-0 left-0 right-0 h-10 px-4 flex items-center justify-between text-sm font-medium text-white z-10 font-sans">
+    <motion.div 
+        className="absolute top-0 left-0 right-0 h-10 px-4 flex items-center justify-between text-sm font-medium text-white z-20 font-sans cursor-grab active:cursor-grabbing"
+        onPanStart={onDragStart}
+        onPan={onDrag}
+        onPanEnd={onDragEnd}
+    >
       <span>{time}</span>
        <div className="flex items-center gap-1 text-xs">
           <span>{network.speed}/s</span>
@@ -66,36 +73,53 @@ const StatusBar = () => {
         <Wifi size={16} />
         <BatteryIcon />
       </div>
-    </div>
+    </motion.div>
   );
 };
 
 const PhoneContent = () => {
-  const { app, wallpaper, setApp } = usePhone();
+  const { app, wallpaper, setApp, brightness } = usePhone();
   const CurrentApp = appMap[app].component;
+  const [isControlCenterOpen, setControlCenterOpen] = useState(false);
   
+  const handleDrag = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    if (info.offset.y > 50) {
+      setControlCenterOpen(true);
+    }
+    if (info.offset.y < -50) {
+        setControlCenterOpen(false);
+    }
+  };
+
   return (
     <div className="relative w-full h-full bg-zinc-800 rounded-[40px] shadow-2xl overflow-hidden border-4 border-black">
-      <StatusBar />
-      <div
-        className="w-full h-full app-screen bg-cover bg-center"
-        style={{ backgroundImage: app === 'home' ? `url(${wallpaper})` : 'none' }}
-      >
-        <div className="app-container h-full">
-          {CurrentApp ? <CurrentApp /> : <p>This app is not available.</p>}
+      <div className="relative w-full h-full" style={{ filter: `brightness(${brightness}%)`}}>
+        <StatusBar 
+            onDragStart={() => {}} 
+            onDrag={handleDrag} 
+            onDragEnd={() => {}}
+        />
+        <div
+          className="w-full h-full app-screen bg-cover bg-center"
+          style={{ backgroundImage: app === 'home' ? `url(${wallpaper})` : 'none' }}
+        >
+          <div className="app-container h-full">
+            {CurrentApp ? <CurrentApp /> : <p>This app is not available.</p>}
+          </div>
+        </div>
+        <div className="absolute bottom-0 left-0 right-0 h-16 flex items-center justify-center">
+           <Button 
+              variant="ghost" 
+              size="icon" 
+              className="bg-white/20 hover:bg-white/30 text-white rounded-full h-12 w-12 backdrop-blur-sm"
+              onClick={() => setApp('home')}
+              aria-label="Home"
+            >
+              <Home size={24} />
+           </Button>
         </div>
       </div>
-      <div className="absolute bottom-0 left-0 right-0 h-16 flex items-center justify-center">
-         <Button 
-            variant="ghost" 
-            size="icon" 
-            className="bg-white/20 hover:bg-white/30 text-white rounded-full h-12 w-12 backdrop-blur-sm"
-            onClick={() => setApp('home')}
-            aria-label="Home"
-          >
-            <Home size={24} />
-         </Button>
-      </div>
+       <ControlCenter isOpen={isControlCenterOpen} setIsOpen={setControlCenterOpen} />
     </div>
   );
 };
