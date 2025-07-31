@@ -108,7 +108,7 @@ const PhoneContent = () => {
           </div>
         </div>
         {app !== 'home' && (
-            <div className="absolute bottom-0 left-0 right-0 h-16 flex items-center justify-center">
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 h-16 flex items-center justify-center">
                <Button 
                   variant="ghost" 
                   size="icon" 

@@ -81,18 +81,18 @@ const CustomizeApp = () => {
 
     return (
         <div className="bg-background h-full flex flex-col font-sans app-container">
-             <header className="p-4 pt-12 bg-background/80 backdrop-blur-sm border-b sticky top-0 z-10 flex items-center justify-between">
+             <header className="p-4 pt-12 bg-background/80 backdrop-blur-sm border-b sticky top-0 z-10 flex items-center justify-between shrink-0">
                 <h1 className="text-xl font-headline font-bold">Customize</h1>
                 <button onClick={() => setApp('home')} className="p-1"><X size={20}/></button>
             </header>
-            <main className="flex-1 overflow-y-auto">
+            <div className="flex-1 min-h-0">
                  <Tabs defaultValue="wallpaper" className="h-full flex flex-col">
-                    <TabsList className="w-full rounded-none sticky top-0 bg-background z-10">
+                    <TabsList className="w-full rounded-none sticky top-0 bg-background z-10 shrink-0">
                         <TabsTrigger value="wallpaper" className="flex-1 gap-2"><Wallpaper size={16}/> Wallpaper</TabsTrigger>
                         <TabsTrigger value="icons" className="flex-1 gap-2"><Sparkles size={16}/> Icons</TabsTrigger>
                     </TabsList>
-                    <TabsContent value="wallpaper" className="flex-1">
-                         <ScrollArea className="h-[calc(100vh-160px)]">
+                    <TabsContent value="wallpaper" className="flex-1 min-h-0">
+                         <ScrollArea className="h-full" hideScrollbar>
                             <div className="p-4 grid grid-cols-3 gap-4">
                                 {wallpapers.map((w) => (
                                 <button key={w.id} onClick={() => setWallpaper(w.url)} className={cn("rounded-lg overflow-hidden border-2 transition-all", w.url === wallpaper ? 'border-primary ring-2 ring-primary scale-105' : 'border-transparent')}>
@@ -109,8 +109,8 @@ const CustomizeApp = () => {
                             </div>
                         </ScrollArea>
                     </TabsContent>
-                    <TabsContent value="icons" className="flex-1">
-                        <ScrollArea className="h-[calc(100vh-160px)]">
+                    <TabsContent value="icons" className="flex-1 min-h-0">
+                        <ScrollArea className="h-full" hideScrollbar>
                             <div className="p-4 space-y-6">
                                 <div>
                                     <Label className="text-base font-semibold mb-2 block">Live Preview</Label>
@@ -158,7 +158,7 @@ const CustomizeApp = () => {
                         </ScrollArea>
                     </TabsContent>
                 </Tabs>
-            </main>
+            </div>
         </div>
     )
 }
