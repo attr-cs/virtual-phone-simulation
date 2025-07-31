@@ -1,3 +1,4 @@
+
 import {
   Calculator,
   Image as GalleryIcon,
@@ -52,20 +53,20 @@ export const appMap: Record<AppId, AppConfig | { component: AppComponent }> = {
 };
 
 export const wallpapers = [
-    { id: '1', name: 'Purple Abstract', url: 'https://placehold.co/390x844/7350C1/FFFFFF', dataAiHint: 'abstract purple' },
-    { id: '2', name: 'Orange Geometric', url: 'https://placehold.co/390x844/E5A209/FFFFFF', dataAiHint: 'geometric orange' },
-    { id: '3', name: 'Cool Blue', url: 'https://placehold.co/390x844/508ac1/FFFFFF', dataAiHint: 'cool blue' },
-    { id: '4', name: 'Dark Space', url: 'https://placehold.co/390x844/1a1a2e/FFFFFF', dataAiHint: 'dark space' },
+    { id: '1', name: 'Purple Abstract', url: 'https://picsum.photos/seed/1/390/844', dataAiHint: 'abstract purple' },
+    { id: '2', name: 'Orange Geometric', url: 'https://picsum.photos/seed/2/390/844', dataAiHint: 'geometric orange' },
+    { id: '3', name: 'Cool Blue', url: 'https://picsum.photos/seed/3/390/844', dataAiHint: 'cool blue' },
+    { id: '4', name: 'Dark Space', url: 'https://picsum.photos/seed/4/390/844', dataAiHint: 'dark space' },
 ];
 
 export const galleryImages = [
-    { id: '1', url: 'https://placehold.co/600x400/a7c5eb/FFFFFF', dataAiHint: 'mountain landscape' },
-    { id: '2', url: 'https://placehold.co/600x400/3c4e6a/FFFFFF', dataAiHint: 'city night' },
-    { id: '3', url: 'https://placehold.co/600x400/ffb347/FFFFFF', dataAiHint: 'beach sunset' },
-    { id: '4', url: 'https://placehold.co/600x400/4a6e4d/FFFFFF', dataAiHint: 'forest path' },
-    { id: '5', url: 'https://placehold.co/600x400/d3a5a5/FFFFFF', dataAiHint: 'desert dunes' },
-    { id: '6', url: 'https://placehold.co/600x400/8e9aaf/FFFFFF', dataAiHint: 'aurora sky' },
-    { id: '7', url: 'https://placehold.co/600x400/c1946a/FFFFFF', dataAiHint: 'canyon rock' },
-    { id: '8', url: 'https://placehold.co/600x400/6b5b95/FFFFFF', dataAiHint: 'lavender field' },
-    { id: '9', url: 'https://placehold.co/600x400/f7cac9/FFFFFF', dataAiHint: 'cherry blossom' },
+    { id: '1', url: 'https://picsum.photos/seed/101/600/400', dataAiHint: 'mountain landscape' },
+    { id: '2', url: 'https://picsum.photos/seed/102/600/400', dataAiHint: 'city night' },
+    { id: '3', url: 'https://picsum.photos/seed/103/600/400', dataAiHint: 'beach sunset' },
+    { id: '4', url: 'https://picsum.photos/seed/104/600/400', dataAiHint: 'forest path' },
+    { id: '5', url: 'https://picsum.photos/seed/105/600/400', dataAiHint: 'desert dunes' },
+    { id: '6', url: 'https://picsum.photos/seed/106/600/400', dataAiHint: 'aurora sky' },
+    { id: '7', url: 'https://picsum.photos/seed/107/600/400', dataAiHint: 'canyon rock' },
+    { id: '8', url: 'https://picsum.photos/seed/108/600/400', dataAiHint: 'lavender field' },
+    { id: '9', url: 'https://picsum.photos/seed/109/600/400', dataAiHint: 'cherry blossom' },
 ];
