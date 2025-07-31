@@ -10,17 +10,16 @@ import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
+import { Slider } from '@/components/ui/slider';
 
 const SettingsApp = () => {
-    const { wallpaper, setWallpaper, setApp } = usePhone();
+    const { wallpaper, setWallpaper, setApp, brightness, setBrightness } = usePhone();
     const [view, setView] = useState<'main' | 'wallpaper'>('main');
 
     const settingsItems = [
         { icon: Wifi, label: 'Wi-Fi', detail: 'HomeNetwork', toggle: true, action: () => {} },
         { icon: Bluetooth, label: 'Bluetooth', detail: 'On', toggle: true, action: () => {} },
         { icon: Bell, label: 'Notifications', detail: '', toggle: false, action: () => {} },
-        { icon: Sun, label: 'Display & Brightness', detail: '', toggle: false, action: () => {} },
-        { icon: Wallpaper, label: 'Wallpaper', detail: '', toggle: false, action: () => setView('wallpaper') },
     ];
 
     const renderMainView = () => (
@@ -29,21 +28,36 @@ const SettingsApp = () => {
                 <button onClick={() => setApp('home')} className="p-1 mr-2"><X size={20}/></button>
                 <h1 className="text-xl font-headline font-bold">Settings</h1>
             </header>
-            <main className="p-4 flex-1 space-y-6">
-                <section className="bg-background rounded-lg">
-                    <ul className="p-2">
-                        {settingsItems.map((item, index) => (
-                            <React.Fragment key={item.label}>
-                             <li className="flex items-center p-2 cursor-pointer" onClick={item.action}>
+            <main className="p-4 flex-1 space-y-4">
+                <section className="bg-card rounded-lg border">
+                    <ul className="divide-y divide-border">
+                        {settingsItems.map((item) => (
+                             <li key={item.label} className="flex items-center p-3 cursor-pointer" onClick={item.action}>
                                 <item.icon className="text-primary" size={20}/>
                                 <Label htmlFor={item.toggle ? item.label : undefined} className="ml-4 flex-1 text-base cursor-pointer">{item.label}</Label>
                                 {item.detail && <span className="text-muted-foreground mr-2">{item.detail}</span>}
                                 {item.toggle ? <Switch id={item.label} defaultChecked /> : <ChevronRight size={16} className="text-muted-foreground" />}
                              </li>
-                             {index < settingsItems.length -1 && <Separator className="ml-14" />}
-                            </React.Fragment>
                         ))}
                     </ul>
+                </section>
+                <section className="bg-card rounded-lg border p-3 space-y-4">
+                     <div className="flex items-center gap-3">
+                         <Sun className="text-primary" size={20}/>
+                         <Slider
+                            value={[brightness]}
+                            onValueChange={(value) => setBrightness(value[0])}
+                            min={20}
+                            max={100}
+                            step={1}
+                            className="w-full"
+                        />
+                     </div>
+                     <button className="w-full flex items-center p-3 cursor-pointer" onClick={() => setView('wallpaper')}>
+                        <Wallpaper className="text-primary" size={20}/>
+                        <span className="ml-4 flex-1 text-base text-left">Wallpaper</span>
+                        <ChevronRight size={16} className="text-muted-foreground" />
+                     </button>
                 </section>
             </main>
         </>
