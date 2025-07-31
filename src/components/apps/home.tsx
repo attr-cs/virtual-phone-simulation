@@ -6,9 +6,10 @@ import { usePhone } from '@/contexts/phone-context';
 import { apps, type AppConfig } from '@/config/apps';
 import { useToast } from "@/hooks/use-toast"
 import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
 
 const AppIcon = ({ app }: { app: AppConfig }) => {
-  const { setApp } = usePhone();
+  const { setApp, iconStyle, iconColor } = usePhone();
   const { toast } = useToast();
   const Icon = app.icon;
 
@@ -23,16 +24,49 @@ const AppIcon = ({ app }: { app: AppConfig }) => {
     }
   };
 
+  const styles = {
+    default: {
+      iconContainer: "bg-white/30 backdrop-blur-md",
+      icon: "text-white"
+    },
+    glass: {
+      iconContainer: "bg-white/10 backdrop-blur-lg border border-white/20",
+      icon: "text-white"
+    },
+    neumorphic: {
+      iconContainer: "bg-zinc-200/50 dark:bg-zinc-800/50 shadow-[4px_4px_8px_#bebebe,-4px_-4px_8px_#ffffff] dark:shadow-[4px_4px_8px_#1a1a1a,-4px_-4px_8px_#2e2e2e]",
+      icon: "text-zinc-800 dark:text-white"
+    },
+    simple: {
+      iconContainer: "bg-transparent",
+      icon: "text-white"
+    }
+  }
+
+  const currentStyle = styles[iconStyle] || styles.default;
+  const iconFinalColor = iconStyle === 'neumorphic' ? currentStyle.icon : iconColor;
+
   return (
-    <button onClick={handleClick} className="flex flex-col items-center gap-1.5 text-center group">
-      <div className={cn(
-          "w-14 h-14 rounded-2xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform",
-          "bg-white/30 backdrop-blur-md"
-       )}>
-        <Icon className="text-white" size={28} />
+    <motion.button 
+        onClick={handleClick} 
+        className="flex flex-col items-center gap-1.5 text-center group"
+        whileTap={{ scale: 0.9 }}
+        whileHover={{ scale: 1.1 }}
+    >
+      <div 
+        className={cn(
+          "w-14 h-14 rounded-2xl flex items-center justify-center shadow-md transition-all",
+          currentStyle.iconContainer
+       )}
+       style={iconStyle === 'simple' ? { backgroundColor: iconColor + '40' } : {}}
+      >
+        <Icon 
+            style={{ color: iconFinalColor }}
+            size={28} 
+        />
       </div>
       <span className="text-white text-xs font-medium drop-shadow-md font-sans [text-shadow:0_1px_1px_rgba(0,0,0,0.4)]">{app.name}</span>
-    </button>
+    </motion.button>
   );
 };
 
@@ -50,17 +84,36 @@ const HomeScreen = () => {
     <div className="h-full" onContextMenu={handleContextMenu}>
         <div className="flex flex-col h-full justify-between pt-20 pb-8">
           <div className="grid grid-cols-4 gap-y-6 px-4">
-            {mainApps.map((app) => (
-              <AppIcon key={app.id} app={app} />
+            {mainApps.map((app, i) => (
+              <motion.div
+                key={app.id}
+                initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: i * 0.05 }}
+              >
+                <AppIcon app={app} />
+              </motion.div>
             ))}
           </div>
           
           <div className="px-4">
-              <div className="bg-white/20 backdrop-blur-lg rounded-3xl h-24 flex items-center justify-around px-2">
-                {dockApps.map((app) => (
-                  <AppIcon key={app.id} app={app} />
+              <motion.div 
+                className="bg-white/20 backdrop-blur-lg rounded-3xl h-24 flex items-center justify-around px-2"
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+              >
+                {dockApps.map((app, i) => (
+                   <motion.div
+                    key={app.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: 0.3 + i * 0.1 }}
+                  >
+                    <AppIcon app={app} />
+                  </motion.div>
                 ))}
-              </div>
+              </motion.div>
           </div>
         </div>
     </div>

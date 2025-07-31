@@ -3,14 +3,28 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { usePhone } from '@/contexts/phone-context';
+import { usePhone, IconStyle } from '@/contexts/phone-context';
 import { wallpapers } from '@/config/apps';
-import { X, Wallpaper } from 'lucide-react';
+import { X, Wallpaper, Sparkles, Palette } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+
+const iconStyles: { id: IconStyle, name: string }[] = [
+    { id: 'default', name: 'Default' },
+    { id: 'glass', name: 'Glass' },
+    { id: 'neumorphic', name: 'Neumorphic' },
+    { id: 'simple', name: 'Simple' },
+]
 
 const CustomizeApp = () => {
-    const { setApp, wallpaper, setWallpaper } = usePhone();
+    const { 
+        setApp, 
+        wallpaper, setWallpaper,
+        iconStyle, setIconStyle,
+        iconColor, setIconColor
+    } = usePhone();
 
     return (
         <div className="bg-background h-full flex flex-col font-sans">
@@ -22,6 +36,7 @@ const CustomizeApp = () => {
                  <Tabs defaultValue="wallpaper" className="h-full flex flex-col">
                     <TabsList className="w-full rounded-none">
                         <TabsTrigger value="wallpaper" className="flex-1 gap-2"><Wallpaper size={16}/> Wallpaper</TabsTrigger>
+                        <TabsTrigger value="icons" className="flex-1 gap-2"><Sparkles size={16}/> Icons</TabsTrigger>
                     </TabsList>
                     <TabsContent value="wallpaper" className="flex-1 overflow-y-auto p-4">
                         <div className="grid grid-cols-3 gap-4">
@@ -37,6 +52,29 @@ const CustomizeApp = () => {
                                 />
                             </button>
                             ))}
+                        </div>
+                    </TabsContent>
+                    <TabsContent value="icons" className="flex-1 overflow-y-auto p-4 space-y-6">
+                        <div className="space-y-2">
+                             <Label className="text-base font-semibold">Icon Color</Label>
+                             <div className="flex items-center gap-4">
+                                <Palette size={20} />
+                                <Input type="color" value={iconColor} onChange={(e) => setIconColor(e.target.value)} className="w-24 h-10 p-1" />
+                             </div>
+                        </div>
+
+                        <div className="space-y-2">
+                             <Label className="text-base font-semibold">Icon Style</Label>
+                             <div className="grid grid-cols-2 gap-4">
+                                {iconStyles.map((style) => (
+                                    <button key={style.id} onClick={() => setIconStyle(style.id)} className={cn("p-4 rounded-lg border-2 flex items-center justify-center", iconStyle === style.id ? 'border-primary ring-2 ring-primary' : 'border-border')}>
+                                        <div className="text-center">
+                                            <div className="w-12 h-12 bg-zinc-200 dark:bg-zinc-700 rounded-xl mx-auto mb-2"></div>
+                                            <p className="text-sm font-medium">{style.name}</p>
+                                        </div>
+                                    </button>
+                                ))}
+                             </div>
                         </div>
                     </TabsContent>
                 </Tabs>
