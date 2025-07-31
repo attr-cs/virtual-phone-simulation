@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { createContext, useState, useContext, ReactNode, useCallback } from 'react';
+import React, { createContext, useState, useContext, ReactNode, useCallback, useEffect } from 'react';
 import type { AppId } from '@/config/apps';
 import { wallpapers } from '@/config/apps';
 
@@ -13,9 +13,10 @@ interface PhoneContextType {
   brightness: number;
   setBrightness: (level: number) => void;
   volume: number;
-  setVolume: React.Dispatch<React.SetStateAction<number>>;
+  setVolume: (v: number | ((v:number) => number)) => void;
   isLocked: boolean;
   setIsLocked: React.Dispatch<React.SetStateAction<boolean>>;
+  showVolume: boolean;
 }
 
 const PhoneContext = createContext<PhoneContextType | undefined>(undefined);
@@ -24,8 +25,24 @@ export const PhoneProvider = ({ children }: { children: ReactNode }) => {
   const [currentApp, setCurrentApp] = useState<AppId>('home');
   const [currentWallpaper, setCurrentWallpaper] = useState<string>(wallpapers[0].url);
   const [brightness, setBrightness] = useState(100);
-  const [volume, setVolume] = useState(50);
-  const [isLocked, setIsLocked] = useState(false);
+  const [volume, _setVolume] = useState(50);
+  const [isLocked, setIsLocked] = useState(true);
+  const [showVolume, setShowVolume] = useState(false);
+
+  const setVolume = (v: number | ((v:number) => number)) => {
+      _setVolume(v);
+      setShowVolume(true);
+  }
+
+  useEffect(() => {
+    if (showVolume) {
+        const timer = setTimeout(() => {
+            setShowVolume(false);
+        }, 2000);
+        return () => clearTimeout(timer);
+    }
+  }, [showVolume]);
+
 
   const value = {
     app: currentApp,
@@ -38,6 +55,7 @@ export const PhoneProvider = ({ children }: { children: ReactNode }) => {
     setVolume,
     isLocked,
     setIsLocked,
+    showVolume,
   };
 
   return <PhoneContext.Provider value={value}>{children}</PhoneContext.Provider>;
@@ -50,5 +68,3 @@ export const usePhone = () => {
   }
   return context;
 };
-
-    

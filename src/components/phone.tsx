@@ -88,7 +88,7 @@ const VolumeIndicator = ({ volume, isVisible }: { volume: number, isVisible: boo
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 20, transition: { duration: 0.3, delay: 0.5 } }}
+                    exit={{ opacity: 0, y: 20, transition: { duration: 0.3, delay: 1.5 } }}
                     className="absolute top-16 left-1/2 -translate-x-1/2 z-30 bg-black/70 backdrop-blur-sm text-white rounded-full px-4 py-2 flex items-center gap-2 shadow-lg"
                 >
                     {getVolumeIcon()}
@@ -136,10 +136,9 @@ const LockScreen = ({ onUnlock }: { onUnlock: () => void }) => {
 }
 
 const PhoneContent = () => {
-  const { app, wallpaper, setApp, brightness, volume, setVolume, isLocked, setIsLocked } = usePhone();
+  const { app, wallpaper, setApp, brightness, volume, showVolume } = usePhone();
   const CurrentApp = appMap[app].component;
   const [isControlCenterOpen, setControlCenterOpen] = useState(false);
-  const [showVolume, setShowVolume] = useState(false);
   
   const handleDrag = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     if (info.offset.y > 50) {
@@ -150,24 +149,10 @@ const PhoneContent = () => {
     }
   };
 
-  const handleVolumeChange = useCallback((newVolume: number) => {
-    setVolume(newVolume);
-    setShowVolume(true);
-    const timer = setTimeout(() => {
-        setShowVolume(false);
-    }, 2000);
-    return () => clearTimeout(timer);
-  }, [setVolume]);
-
-
   return (
     <div className="relative w-full h-full bg-zinc-800 rounded-[40px] shadow-2xl overflow-hidden border-4 border-black">
       <VolumeIndicator volume={volume} isVisible={showVolume} />
       <div className="relative w-full h-full" style={{ filter: `brightness(${brightness}%)`}}>
-        <AnimatePresence>
-         {isLocked && <LockScreen onUnlock={() => setIsLocked(false)} />}
-        </AnimatePresence>
-        <div className={cn("transition-filter duration-300", isLocked ? 'blur-md' : 'blur-none')}>
             <StatusBar 
                 onDragStart={() => {}} 
                 onDrag={handleDrag} 
@@ -191,7 +176,6 @@ const PhoneContent = () => {
               </AnimatePresence>
             </div>
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 h-1 w-32 bg-white/80 rounded-full cursor-pointer" onClick={() => setApp('home')}></div>
-          </div>
       </div>
        <ControlCenter isOpen={isControlCenterOpen} setIsOpen={setControlCenterOpen} />
     </div>
@@ -242,5 +226,3 @@ const PhoneContentWithButtons = () => {
 }
 
 export default Phone;
-
-    

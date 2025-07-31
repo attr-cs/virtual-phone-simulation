@@ -97,7 +97,7 @@ const HomeScreen = () => {
   }
 
   return (
-    <div className="h-full" onContextMenu={handleContextMenu}>
+    <div className="h-full flex flex-col" onContextMenu={handleContextMenu}>
       <AnimatePresence>
         <motion.div 
             key="home-screen"
@@ -105,7 +105,7 @@ const HomeScreen = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="flex flex-col h-full justify-between pt-20 pb-8"
+            className="flex-1 flex flex-col justify-between pt-20 pb-8"
         >
           <div className="grid grid-cols-4 gap-y-6 px-4">
             {mainApps.map((app, i) => (
