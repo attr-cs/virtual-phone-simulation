@@ -4,77 +4,43 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { PhoneProvider, usePhone } from '@/contexts/phone-context';
 import { appMap } from '@/config/apps';
-import { Wifi, BatteryFull, BatteryMedium, BatteryLow, Signal, SignalLow, SignalMedium, Power, Sun } from 'lucide-react';
+import { Wifi, BatteryFull, BatteryMedium, BatteryLow, Signal, SignalLow, SignalMedium, Sun } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ControlCenter from './control-center';
 import { motion, PanInfo, AnimatePresence } from 'framer-motion';
 
 const StatusBar = ({ onDragStart, onDrag, onDragEnd }: { onDragStart: any, onDrag: any, onDragEnd: any }) => {
   const [time, setTime] = useState('');
-  const [network, setNetwork] = useState({ signal: 3, speed: '1.2MB' });
-  const [battery, setBattery] = useState(100);
-
+  
   useEffect(() => {
     const update = () => {
        try {
         setTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }))
       } catch (e) {
-        // locale is not available on server, so we just set it to empty string
         setTime('')
       }
     };
     update();
-    const timer = setInterval(update, 1000 * 30); // Update every 30 seconds
-
-    const networkInterval = setInterval(() => {
-      const signal = Math.floor(Math.random() * 3) + 1;
-      let speed;
-      if (signal === 1) speed = `${Math.floor(Math.random() * 50)}KB`;
-      else if (signal === 2) speed = `${Math.floor(Math.random() * 500)}KB`;
-      else speed = `${(Math.random() * 1.5).toFixed(1)}MB`;
-      setNetwork({ signal, speed });
-    }, 3000);
-
-    const batteryInterval = setInterval(() => {
-      setBattery(b => Math.max(0, b - 1));
-    }, 60 * 1000);
-
-
-    return () => {
-      clearInterval(timer)
-      clearInterval(networkInterval)
-      clearInterval(batteryInterval)
-    };
+    const timer = setInterval(update, 1000 * 30);
+    return () => clearInterval(timer);
   }, []);
-
-  const SignalIcon = () => {
-    if (network.signal === 1) return <SignalLow size={16} />;
-    if (network.signal === 2) return <SignalMedium size={16} />;
-    return <Signal size={16} />;
-  }
-
-  const BatteryIcon = () => {
-    if (battery < 20) return <BatteryLow size={20} />;
-    if (battery < 60) return <BatteryMedium size={20} />;
-    return <BatteryFull size={20} />;
-  }
 
   return (
     <motion.div 
-        className="absolute top-0 left-0 right-0 h-10 px-4 flex items-center justify-between text-sm font-medium text-white z-20 font-sans cursor-grab active:cursor-grabbing [text-shadow:0_1px_2px_rgba(0,0,0,0.5)]"
+        className="absolute top-0 left-0 right-0 h-10 px-6 flex items-center justify-between text-sm font-bold text-white z-20 font-sans [text-shadow:0_1px_2px_rgba(0,0,0,0.5)]"
         onPanStart={onDragStart}
         onPan={onDrag}
         onPanEnd={onDragEnd}
     >
       <span>{time}</span>
-       <div className="flex items-center gap-1 text-xs">
-          <span>{network.speed}/s</span>
+      <div className="absolute left-1/2 -translate-x-1/2 bg-black w-28 h-8 rounded-b-2xl flex items-center justify-center gap-4">
+        <div className="w-12 h-1.5 bg-zinc-800 rounded-full"></div>
+        <div className="w-2 h-2 bg-zinc-800 rounded-full"></div>
       </div>
-      <div className="absolute left-1/2 -translate-x-1/2 bg-black w-24 h-6 rounded-b-xl"></div>
       <div className="flex items-center gap-1.5">
-        <SignalIcon />
+        <Signal size={16} />
         <Wifi size={16} />
-        <BatteryIcon />
+        <BatteryFull size={20} />
       </div>
     </motion.div>
   );
@@ -89,7 +55,7 @@ const VolumeIndicator = ({ volume, isVisible }: { volume: number, isVisible: boo
                     animate={{ x: 0, opacity: 1 }}
                     exit={{ x: -40, opacity: 0, transition: { duration: 0.4, ease: 'easeOut', delay: 1.5 } }}
                     transition={{ type: 'spring', stiffness: 400, damping: 40 }}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 z-30"
+                    className="absolute left-1 top-1/2 -translate-y-1/2 z-30"
                 >
                     <div className="w-8 h-40 bg-white/80 backdrop-blur-md rounded-full p-1.5 flex flex-col-reverse">
                        <motion.div
@@ -112,8 +78,13 @@ const LockScreen = ({ onUnlock }: { onUnlock: () => void }) => {
     useEffect(() => {
         const update = () => {
             const now = new Date();
-            setTime(now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-            setDate(now.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' }));
+             try {
+                setTime(now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+                setDate(now.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' }));
+            } catch(e) {
+                setTime('');
+                setDate('');
+            }
         }
         update();
         const timer = setInterval(update, 1000 * 30);
@@ -125,16 +96,16 @@ const LockScreen = ({ onUnlock }: { onUnlock: () => void }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black text-white flex flex-col items-center justify-center z-40"
+            className="absolute inset-0 bg-black text-white flex flex-col items-center z-40"
             onClick={onUnlock}
         >
-            <div className="absolute top-24 text-center">
-                 <p className="text-7xl font-bold font-headline">{time}</p>
-                 <p className="text-xl">{date}</p>
+            <div className="absolute top-32 text-center">
+                 <p className="text-8xl font-bold font-headline">{time}</p>
+                 <p className="text-xl mt-1">{date}</p>
             </div>
-            <div className="absolute bottom-20 flex flex-col items-center gap-2">
-                 <p className="text-sm font-medium">Tap to unlock</p>
-                 <Sun size={24} />
+            <div className="absolute bottom-20 flex flex-col items-center gap-4">
+                 <p className="text-sm font-medium">Swipe up to unlock</p>
+                 <div className="w-36 h-1.5 bg-white/50 rounded-full"></div>
             </div>
         </motion.div>
     );
@@ -155,7 +126,7 @@ const PhoneContent = () => {
   };
 
   return (
-    <div className="relative w-full h-full bg-zinc-800 rounded-[40px] shadow-2xl overflow-hidden border-4 border-black">
+    <div className="relative w-full h-full bg-zinc-800 rounded-[56px] shadow-2xl overflow-hidden border-4 border-black">
       <VolumeIndicator volume={volume} isVisible={showVolume} />
       <div className="relative w-full h-full" style={{ filter: `brightness(${brightness}%)`}}>
             <AnimatePresence>
@@ -183,13 +154,18 @@ const PhoneContent = () => {
                   </motion.div>
               </AnimatePresence>
             </div>
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
+            <motion.div 
+                className="absolute bottom-4 left-1/2 -translate-x-1/2"
+                initial={{ opacity: isLocked ? 0 : 1 }}
+                animate={{ opacity: isLocked ? 0 : 1 }}
+                transition={{ duration: 0.3 }}
+            >
                 <button
                     onClick={() => setApp('home')}
-                    className="h-1 w-32 bg-white/80 rounded-full cursor-pointer transition-transform active:scale-95"
+                    className="h-1.5 w-36 bg-white/80 rounded-full cursor-pointer transition-transform active:scale-95"
                     aria-label="Home button"
                 />
-            </div>
+            </motion.div>
       </div>
        <ControlCenter isOpen={isControlCenterOpen} setIsOpen={setControlCenterOpen} />
     </div>
@@ -199,9 +175,9 @@ const PhoneContent = () => {
 
 const PhoneBack = () => {
     return (
-        <div className="absolute inset-0 w-full h-full bg-slate-900 rounded-[40px] p-4 flex flex-col items-center justify-between [transform:rotateY(180deg)] [backface-visibility:hidden]">
+        <div className="absolute inset-0 w-full h-full bg-slate-900 rounded-[56px] p-4 flex flex-col items-center justify-between [transform:rotateY(180deg)] [backface-visibility:hidden]">
             
-            <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-slate-800 via-slate-900 to-black rounded-[40px] overflow-hidden">
+            <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-zinc-800 via-zinc-900 to-black rounded-[56px] overflow-hidden">
                  <div className="absolute -inset-20 w-[150%] h-[150%] bg-gradient-to-br from-white/10 via-transparent to-white/10 opacity-0 group-hover/phone:opacity-100 transition-opacity duration-700 animate-[shine_5s_ease-in-out_infinite]"></div>
             </div>
 
@@ -213,20 +189,25 @@ const PhoneBack = () => {
             `}</style>
             
             <div className="relative w-full flex justify-end p-2 z-10">
-                <div className="w-24 h-28 bg-black/20 backdrop-blur-md rounded-3xl p-2 self-start flex items-center justify-center border border-white/10 shadow-2xl">
-                    <div className="w-full h-full bg-black/10 rounded-[18px] grid grid-cols-2 grid-rows-2 gap-1 p-1">
+                <div className="w-28 h-32 bg-black/20 backdrop-blur-lg rounded-3xl p-2 self-start flex items-center justify-center border border-white/10 shadow-2xl">
+                    <div className="w-full h-full bg-black/10 rounded-[18px] grid grid-cols-2 grid-rows-2 gap-2 p-1">
                        <div className="relative w-full h-full flex items-center justify-center">
-                            <div className="absolute w-8 h-8 rounded-full bg-gradient-to-br from-zinc-700 to-zinc-900 ring-2 ring-zinc-600"></div>
-                            <div className="absolute w-7 h-7 rounded-full bg-gradient-to-br from-sky-400 to-blue-600 opacity-80 ring-1 ring-black/50"></div>
-                            <div className="absolute w-3 h-3 rounded-full bg-gradient-to-br from-sky-200 to-blue-400 opacity-60 blur-sm"></div>
-                            <div className="w-2 h-2 rounded-full bg-white opacity-70"></div>
+                            <div className="absolute w-10 h-10 rounded-full bg-gradient-to-br from-zinc-700 to-zinc-900 ring-2 ring-zinc-600"></div>
+                            <div className="absolute w-8 h-8 rounded-full bg-gradient-to-br from-sky-400 to-blue-600 opacity-80 ring-1 ring-black/50"></div>
+                            <div className="absolute w-4 h-4 rounded-full bg-gradient-to-br from-sky-200 to-blue-400 opacity-60 blur-sm"></div>
+                            <div className="w-2.5 h-2.5 rounded-full bg-white opacity-70"></div>
                        </div>
                        <div className="relative w-full h-full flex items-center justify-center">
+                             <div className="absolute w-10 h-10 rounded-full bg-gradient-to-br from-zinc-800 to-black ring-2 ring-zinc-700"></div>
+                             <div className="absolute w-8 h-8 rounded-full bg-gradient-to-br from-zinc-900 to-black"></div>
+                            <div className="w-2.5 h-2.5 rounded-full bg-zinc-400 opacity-70"></div>
+                       </div>
+                        <div className="relative w-full h-full flex items-center justify-center -translate-y-2">
                              <div className="absolute w-8 h-8 rounded-full bg-gradient-to-br from-zinc-800 to-black ring-2 ring-zinc-700"></div>
                              <div className="absolute w-7 h-7 rounded-full bg-gradient-to-br from-zinc-900 to-black"></div>
                             <div className="w-2 h-2 rounded-full bg-zinc-400 opacity-70"></div>
                        </div>
-                       <div className="col-span-2 flex items-center justify-evenly pt-1">
+                       <div className="col-span-2 flex items-center justify-evenly pt-1 -translate-y-3">
                          <div className="w-3 h-3 rounded-full bg-gradient-to-br from-yellow-300 to-amber-500 opacity-70 ring-1 ring-black/50"></div>
                          <div className="w-2 h-2 rounded-full bg-zinc-600"></div>
                        </div>
@@ -248,26 +229,27 @@ const PhoneBack = () => {
 
 const SideButton = ({ className, ...props }: React.ComponentProps<typeof motion.button>) => (
     <motion.button 
-        className={cn("bg-zinc-700/80 rounded-md outline-none appearance-none focus:outline-none focus-visible:outline-none ring-0 focus:ring-0 focus-visible:ring-0", className)}
-        whileTap={{ scale: 0.9, x: -2, backgroundColor: '#A1A1AA' }}
+        className={cn("bg-zinc-700/80 rounded-md outline-none appearance-none", className)}
+        whileTap={{ scale: 0.95, x: -2, backgroundColor: '#A1A1AA' }}
         transition={{ duration: 0.1, ease: "easeOut" }}
+        style={{ outline: 'none', WebkitTapHighlightColor: 'transparent' }}
         {...props}
+        onFocus={(e) => e.target.blur()}
     />
 );
-
 
 const Phone = ({ isFlipped }: { isFlipped: boolean }) => {
   return (
     <PhoneProvider>
-      <div className="relative w-[390px] h-[844px] scale-90 md:scale-100 transition-transform [perspective:2000px] group/phone">
+      <div className="relative w-[430px] h-[884px] scale-90 md:scale-100 transition-transform [perspective:2000px] group/phone">
         <motion.div 
             className="relative w-full h-full [transform-style:preserve-3d]"
             initial={false}
             animate={{ rotateY: isFlipped ? 180 : 0 }}
             transition={{ duration: 0.7, ease: [0.32, 0.72, 0, 1] }}
         >
-            <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] bg-zinc-800 rounded-[48px] shadow-lg">
-                <div className="absolute -inset-2 bg-zinc-800 rounded-[48px] shadow-lg"></div>
+            <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] bg-zinc-800 rounded-[58px] shadow-lg">
+                <div className="absolute -inset-px bg-zinc-800 rounded-[58px] shadow-lg"></div>
                 <PhoneContentWithButtons />
             </div>
              <PhoneBack />
@@ -293,9 +275,9 @@ const PhoneContentWithButtons = () => {
     return (
         <>
             <PhoneContent />
-            <SideButton className="absolute left-[-6px] top-[120px] w-1.5 h-16" onClick={handleVolumeUp} />
-            <SideButton className="absolute left-[-6px] top-[190px] w-1.5 h-16" onClick={handleVolumeDown} />
-            <SideButton className="absolute right-[-6px] top-[150px] w-1.5 h-24" onClick={handlePower} />
+            <SideButton className="absolute left-[-6px] top-[120px] w-1.5 h-20" onClick={handleVolumeUp} />
+            <SideButton className="absolute left-[-6px] top-[210px] w-1.5 h-20" onClick={handleVolumeDown} />
+            <SideButton className="absolute right-[-6px] top-[180px] w-1.5 h-32" onClick={handlePower} />
         </>
     )
 }
