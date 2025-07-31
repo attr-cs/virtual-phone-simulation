@@ -21,8 +21,9 @@ import CameraApp from '@/components/apps/camera';
 import MessagesApp from '@/components/apps/messages';
 import SettingsApp from '@/components/apps/settings';
 import BrowserApp from '@/components/apps/browser';
+import CustomizeApp from '@/components/apps/customize';
 
-export const appIds = ['home', 'calculator', 'gallery', 'camera', 'messages', 'settings', 'browser', 'files', 'voice-memos', 'games'] as const;
+export const appIds = ['home', 'calculator', 'gallery', 'camera', 'messages', 'settings', 'browser', 'files', 'voice-memos', 'games', 'customize'] as const;
 export type AppId = (typeof appIds)[number];
 
 type AppComponent = React.ComponentType;
@@ -47,8 +48,9 @@ export const apps: AppConfig[] = [
   { id: 'games', name: 'Games', icon: Gamepad2, component: null },
 ];
 
-export const appMap: Record<AppId, AppConfig | { component: AppComponent }> = {
+export const appMap: Record<AppId, { component: AppComponent | null, name?: string }> = {
   home: { component: HomeScreen },
+  customize: { component: CustomizeApp, name: 'Customize' },
   ...apps.reduce((acc, app) => ({ ...acc, [app.id]: app }), {} as Record<AppId, AppConfig>)
 };
 

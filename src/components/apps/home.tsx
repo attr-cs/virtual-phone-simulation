@@ -1,18 +1,11 @@
 
 "use client";
 
-import React, { useState } from 'react';
+import React from 'react';
 import { usePhone } from '@/contexts/phone-context';
-import { apps, type AppConfig, wallpapers } from '@/config/apps';
+import { apps, type AppConfig } from '@/config/apps';
 import { useToast } from "@/hooks/use-toast"
 import { cn } from '@/lib/utils';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
-import Image from 'next/image';
 
 const AppIcon = ({ app }: { app: AppConfig }) => {
   const { setApp } = usePhone();
@@ -43,68 +36,34 @@ const AppIcon = ({ app }: { app: AppConfig }) => {
   );
 };
 
-const CustomizationDialog = ({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) => {
-    const { wallpaper, setWallpaper } = usePhone();
-    return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="w-[374px] rounded-[32px]">
-                <DialogHeader>
-                    <DialogTitle>Customize Home Screen</DialogTitle>
-                </DialogHeader>
-                <div>
-                     <h3 className="text-lg font-medium mb-2">Wallpaper</h3>
-                     <div className="grid grid-cols-3 gap-4">
-                        {wallpapers.map((w) => (
-                          <button key={w.id} onClick={() => setWallpaper(w.url)} className={cn("rounded-lg overflow-hidden border-2 transition-all", w.url === wallpaper ? 'border-primary ring-2 ring-primary scale-105' : 'border-transparent')}>
-                            <Image
-                              src={w.url}
-                              alt={w.name}
-                              width={100}
-                              height={200}
-                              className="w-full h-full object-cover aspect-[9/19]"
-                              data-ai-hint={w.dataAiHint}
-                            />
-                          </button>
-                        ))}
-                      </div>
-                </div>
-            </DialogContent>
-        </Dialog>
-    )
-}
-
-
 const HomeScreen = () => {
+  const { setApp } = usePhone();
   const mainApps = apps.filter(app => !app.inDock);
   const dockApps = apps.filter(app => app.inDock);
-  const [isCustomizeOpen, setCustomizeOpen] = useState(false);
   
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
-    setCustomizeOpen(true);
+    setApp('customize');
   }
 
   return (
-    <>
-      <div className="h-full" onContextMenu={handleContextMenu}>
-          <div className="flex flex-col h-full justify-between pt-20 pb-8">
-            <div className="grid grid-cols-4 gap-y-6 px-4">
-              {mainApps.map((app) => (
-                <AppIcon key={app.id} app={app} />
-              ))}
-            </div>
-            
-            <div className="px-4">
-                <div className="bg-white/20 backdrop-blur-lg rounded-3xl h-24 flex items-center justify-around px-2">
-                  {dockApps.map((app) => (
-                    <AppIcon key={app.id} app={app} />
-                  ))}
-                </div>
-            </div>
+    <div className="h-full" onContextMenu={handleContextMenu}>
+        <div className="flex flex-col h-full justify-between pt-20 pb-8">
+          <div className="grid grid-cols-4 gap-y-6 px-4">
+            {mainApps.map((app) => (
+              <AppIcon key={app.id} app={app} />
+            ))}
           </div>
-      </div>
-      <CustomizationDialog open={isCustomizeOpen} onOpenChange={setCustomizeOpen} />
-    </>
+          
+          <div className="px-4">
+              <div className="bg-white/20 backdrop-blur-lg rounded-3xl h-24 flex items-center justify-around px-2">
+                {dockApps.map((app) => (
+                  <AppIcon key={app.id} app={app} />
+                ))}
+              </div>
+          </div>
+        </div>
+    </div>
   );
 };
 
