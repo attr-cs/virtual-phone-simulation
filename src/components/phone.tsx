@@ -78,25 +78,26 @@ const VolumeIndicator = ({ volume, isVisible }: { volume: number, isVisible: boo
         <AnimatePresence>
             {isVisible && (
                 <motion.div
-                    initial={{ y: -50, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1, transition: { type: 'spring', stiffness: 300, damping: 30 } }}
-                    exit={{ y: -50, opacity: 0, transition: { duration: 0.5, ease: 'anticipate', delay: 1.5 } }}
-                    className="absolute top-0 left-0 right-0 z-30 flex justify-center pt-2"
+                    initial={{ y: -20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: -20, opacity: 0, transition: { duration: 0.4, ease: 'easeOut', delay: 1.5 } }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 40 }}
+                    className="absolute top-0 left-0 right-0 z-30 p-1"
                 >
-                    <div className="w-32 h-2 rounded-full bg-black/50 backdrop-blur-sm shadow-lg overflow-hidden">
+                    <div className="h-2.5 rounded-t-full bg-black/40 backdrop-blur-sm shadow-lg overflow-hidden">
                         <motion.div
-                            className="h-full bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-400"
+                            className="h-full bg-gradient-to-r from-blue-500 via-cyan-400 to-indigo-500"
                             style={{ width: `${volume}%` }}
                             transition={{ ease: 'easeOut', duration: 0.3 }}
                         >
                             <motion.div
-                                className="h-full w-full opacity-30"
+                                className="h-full w-full opacity-40"
                                 style={{
-                                    backgroundImage: 'linear-gradient(45deg, rgba(255,255,255,0.4) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0.4) 75%, transparent 75%, transparent)',
-                                    backgroundSize: '20px 20px',
+                                    backgroundImage: 'linear-gradient(45deg, rgba(255,255,255,0.6) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0.6) 75%, transparent 75%, transparent)',
+                                    backgroundSize: '30px 30px',
                                 }}
-                                animate={{ backgroundPositionX: ['0px', '20px'] }}
-                                transition={{ repeat: Infinity, duration: 0.8, ease: 'linear' }}
+                                animate={{ backgroundPositionX: ['0px', '30px'] }}
+                                transition={{ repeat: Infinity, duration: 0.7, ease: 'linear' }}
                             />
                         </motion.div>
                     </div>
