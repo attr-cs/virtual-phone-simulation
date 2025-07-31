@@ -15,7 +15,14 @@ const StatusBar = ({ onDragStart, onDrag, onDragEnd }: { onDragStart: any, onDra
   const [battery, setBattery] = useState(100);
 
   useEffect(() => {
-    const update = () => setTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+    const update = () => {
+       try {
+        setTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }))
+      } catch (e) {
+        // locale is not available on server, so we just set it to empty string
+        setTime('')
+      }
+    };
     update();
     const timer = setInterval(update, 1000 * 30); // Update every 30 seconds
 
@@ -192,25 +199,46 @@ const PhoneContent = () => {
 
 const PhoneBack = () => {
     return (
-        <div className="absolute inset-0 w-full h-full bg-zinc-800 rounded-[40px] p-6 flex flex-col items-center justify-between [transform:rotateY(180deg)] [backface-visibility:hidden]">
-            <div className="w-24 h-24 bg-black/20 rounded-3xl p-2 self-start flex items-center justify-center">
-                <div className="w-full h-full bg-black/10 rounded-[18px] grid grid-cols-2 gap-1.5 p-1.5">
-                   <div className="w-full h-full bg-gradient-to-br from-zinc-600 to-zinc-800 rounded-full flex items-center justify-center">
-                        <div className="w-4 h-4 rounded-full bg-gradient-to-br from-sky-400 to-blue-600 opacity-80 ring-1 ring-black/50"></div>
-                   </div>
-                   <div className="w-full h-full bg-gradient-to-br from-zinc-900 to-zinc-900 rounded-full"></div>
-                   <div className="w-full h-full bg-gradient-to-br from-zinc-900 to-zinc-900 rounded-full"></div>
-                   <div className="w-full h-full bg-gradient-to-br from-zinc-700 to-zinc-900 rounded-full flex items-center justify-center">
-                         <div className="w-2 h-2 rounded-full bg-yellow-300 opacity-50"></div>
-                   </div>
+        <div className="absolute inset-0 w-full h-full bg-slate-900 rounded-[40px] p-4 flex flex-col items-center justify-between [transform:rotateY(180deg)] [backface-visibility:hidden]">
+            
+            <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-slate-800 via-slate-900 to-black rounded-[40px] overflow-hidden">
+                 <div className="absolute -inset-20 w-[150%] h-[150%] bg-gradient-to-br from-white/10 via-transparent to-white/10 opacity-0 group-hover/phone:opacity-100 transition-opacity duration-700 animate-[shine_5s_ease-in-out_infinite]"></div>
+            </div>
+
+            <style jsx>{`
+                @keyframes shine {
+                    0%, 100% { transform: translateX(-50%) translateY(-50%) rotate(0deg); }
+                    50% { transform: translateX(-50%) translateY(-50%) rotate(360deg); }
+                }
+            `}</style>
+            
+            <div className="relative w-full flex justify-end p-2 z-10">
+                <div className="w-24 h-28 bg-black/20 backdrop-blur-md rounded-3xl p-2 self-start flex items-center justify-center border border-white/10 shadow-2xl">
+                    <div className="w-full h-full bg-black/10 rounded-[18px] grid grid-cols-2 grid-rows-2 gap-1 p-1">
+                       <div className="relative w-full h-full flex items-center justify-center">
+                            <div className="absolute w-8 h-8 rounded-full bg-gradient-to-br from-zinc-700 to-zinc-900 ring-2 ring-zinc-600"></div>
+                            <div className="absolute w-7 h-7 rounded-full bg-gradient-to-br from-sky-400 to-blue-600 opacity-80 ring-1 ring-black/50"></div>
+                            <div className="absolute w-3 h-3 rounded-full bg-gradient-to-br from-sky-200 to-blue-400 opacity-60 blur-sm"></div>
+                            <div className="w-2 h-2 rounded-full bg-white opacity-70"></div>
+                       </div>
+                       <div className="relative w-full h-full flex items-center justify-center">
+                             <div className="absolute w-8 h-8 rounded-full bg-gradient-to-br from-zinc-800 to-black ring-2 ring-zinc-700"></div>
+                             <div className="absolute w-7 h-7 rounded-full bg-gradient-to-br from-zinc-900 to-black"></div>
+                            <div className="w-2 h-2 rounded-full bg-zinc-400 opacity-70"></div>
+                       </div>
+                       <div className="col-span-2 flex items-center justify-evenly pt-1">
+                         <div className="w-3 h-3 rounded-full bg-gradient-to-br from-yellow-300 to-amber-500 opacity-70 ring-1 ring-black/50"></div>
+                         <div className="w-2 h-2 rounded-full bg-zinc-600"></div>
+                       </div>
+                    </div>
                 </div>
             </div>
 
-            <div className="text-zinc-500">
+            <div className="relative text-zinc-500 z-10">
                 <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="currentColor"><path d="M13.294 6.516c-1.144-.06-2.956.84-3.816 1.848-.8.864-1.512 2.017-1.464 3.3.084 1.536 1.284 2.568 2.472 2.568.42 0 .84-.132 1.284-.336-.384.624-.312 1.344.276 2.004.624.684 1.5.876 2.22.564.072.132.156.252.24.372.3.432.66.864 1.14 1.056.456.204.936.204 1.356-.036.336-.204.66-.528.852-.888.168-.312.288-.636.324-.96.024-.264.012-.528-.024-.78-.06-.396-.18-.768-.372-1.104-.264-.468-.6-.876-1.128-1.068-.528-.204-1.188-.132-1.8.216.036-.576.012-1.152-.084-1.716-.144-.756-.468-1.5-1.056-2.136-.552-.6-1.284-1.104-2.184-1.224Zm3.432 7.764c.24-.036.42-.084.588-.144.288-.12.564-.288.756-.564.18-.252.3-.564.324-.9.036-.444-.084-.876-.324-1.236-.228-.36-.564-.624-.948-.792-.372-.156-.816-.18-1.224-.024-.432.168-.78.504-1.02.9-.24.384-.36.84-.324 1.32.036.468.24.9.552 1.212.324.324.732.504 1.176.492.204 0 .408-.036.528-.072Z"/></svg>
             </div>
             
-            <div className="text-center text-zinc-600 text-[10px] self-center">
+            <div className="relative text-center text-zinc-600 text-[10px] self-center z-10">
                 <p>Designed by Gemini in California</p>
                 <p>Assembled in the Cloud</p>
             </div>
@@ -220,8 +248,8 @@ const PhoneBack = () => {
 
 const SideButton = ({ className, ...props }: React.ComponentProps<typeof motion.button>) => (
     <motion.button 
-        className={cn("bg-zinc-600 rounded-md outline-none focus:outline-none focus-visible:outline-none", className)}
-        whileTap={{ scale: 0.85, x: -2, backgroundColor: '#A1A1AA' }}
+        className={cn("bg-zinc-700/80 rounded-md outline-none appearance-none focus:outline-none focus-visible:outline-none ring-0 focus:ring-0 focus-visible:ring-0", className)}
+        whileTap={{ scale: 0.9, x: -2, backgroundColor: '#A1A1AA' }}
         transition={{ duration: 0.1, ease: "easeOut" }}
         {...props}
     />
@@ -231,14 +259,14 @@ const SideButton = ({ className, ...props }: React.ComponentProps<typeof motion.
 const Phone = ({ isFlipped }: { isFlipped: boolean }) => {
   return (
     <PhoneProvider>
-      <div className="relative w-[390px] h-[844px] scale-90 md:scale-100 transition-transform [perspective:2000px]">
+      <div className="relative w-[390px] h-[844px] scale-90 md:scale-100 transition-transform [perspective:2000px] group/phone">
         <motion.div 
             className="relative w-full h-full [transform-style:preserve-3d]"
             initial={false}
             animate={{ rotateY: isFlipped ? 180 : 0 }}
             transition={{ duration: 0.7, ease: [0.32, 0.72, 0, 1] }}
         >
-            <div className="absolute inset-0 w-full h-full [backface-visibility:hidden]">
+            <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] bg-zinc-800 rounded-[48px] shadow-lg">
                 <div className="absolute -inset-2 bg-zinc-800 rounded-[48px] shadow-lg"></div>
                 <PhoneContentWithButtons />
             </div>
@@ -265,11 +293,13 @@ const PhoneContentWithButtons = () => {
     return (
         <>
             <PhoneContent />
-            <SideButton className="absolute left-[-10px] top-[120px] w-1 h-16" onClick={handleVolumeUp} />
-            <SideButton className="absolute left-[-10px] top-[190px] w-1 h-16" onClick={handleVolumeDown} />
-            <SideButton className="absolute right-[-10px] top-[150px] w-1 h-24" onClick={handlePower} />
+            <SideButton className="absolute left-[-6px] top-[120px] w-1.5 h-16" onClick={handleVolumeUp} />
+            <SideButton className="absolute left-[-6px] top-[190px] w-1.5 h-16" onClick={handleVolumeDown} />
+            <SideButton className="absolute right-[-6px] top-[150px] w-1.5 h-24" onClick={handlePower} />
         </>
     )
 }
 
 export default Phone;
+
+    
