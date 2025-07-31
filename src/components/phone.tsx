@@ -189,6 +189,35 @@ const PhoneContent = () => {
   );
 };
 
+
+const PhoneBack = () => {
+    return (
+        <div className="absolute inset-0 w-full h-full bg-zinc-800 rounded-[40px] p-6 flex flex-col items-center justify-between [transform:rotateY(180deg)] [backface-visibility:hidden]">
+            <div className="w-24 h-24 bg-black/20 rounded-3xl p-2 self-start flex items-center justify-center">
+                <div className="w-full h-full bg-black/10 rounded-[18px] grid grid-cols-2 gap-1.5 p-1.5">
+                   <div className="w-full h-full bg-gradient-to-br from-zinc-600 to-zinc-800 rounded-full flex items-center justify-center">
+                        <div className="w-4 h-4 rounded-full bg-gradient-to-br from-sky-400 to-blue-600 opacity-80 ring-1 ring-black/50"></div>
+                   </div>
+                   <div className="w-full h-full bg-gradient-to-br from-zinc-900 to-zinc-900 rounded-full"></div>
+                   <div className="w-full h-full bg-gradient-to-br from-zinc-900 to-zinc-900 rounded-full"></div>
+                   <div className="w-full h-full bg-gradient-to-br from-zinc-700 to-zinc-900 rounded-full flex items-center justify-center">
+                         <div className="w-2 h-2 rounded-full bg-yellow-300 opacity-50"></div>
+                   </div>
+                </div>
+            </div>
+
+            <div className="text-zinc-500">
+                <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="currentColor"><path d="M13.294 6.516c-1.144-.06-2.956.84-3.816 1.848-.8.864-1.512 2.017-1.464 3.3.084 1.536 1.284 2.568 2.472 2.568.42 0 .84-.132 1.284-.336-.384.624-.312 1.344.276 2.004.624.684 1.5.876 2.22.564.072.132.156.252.24.372.3.432.66.864 1.14 1.056.456.204.936.204 1.356-.036.336-.204.66-.528.852-.888.168-.312.288-.636.324-.96.024-.264.012-.528-.024-.78-.06-.396-.18-.768-.372-1.104-.264-.468-.6-.876-1.128-1.068-.528-.204-1.188-.132-1.8.216.036-.576.012-1.152-.084-1.716-.144-.756-.468-1.5-1.056-2.136-.552-.6-1.284-1.104-2.184-1.224Zm3.432 7.764c.24-.036.42-.084.588-.144.288-.12.564-.288.756-.564.18-.252.3-.564.324-.9.036-.444-.084-.876-.324-1.236-.228-.36-.564-.624-.948-.792-.372-.156-.816-.18-1.224-.024-.432.168-.78.504-1.02.9-.24.384-.36.84-.324 1.32.036.468.24.9.552 1.212.324.324.732.504 1.176.492.204 0 .408-.036.528-.072Z"/></svg>
+            </div>
+            
+            <div className="text-center text-zinc-600 text-[10px] self-center">
+                <p>Designed by Gemini in California</p>
+                <p>Assembled in the Cloud</p>
+            </div>
+        </div>
+    )
+}
+
 const SideButton = ({ className, ...props }: React.ComponentProps<typeof motion.button>) => (
     <motion.button 
         className={cn("bg-zinc-600 rounded-md outline-none focus:outline-none focus-visible:outline-none", className)}
@@ -199,12 +228,22 @@ const SideButton = ({ className, ...props }: React.ComponentProps<typeof motion.
 );
 
 
-const Phone = () => {
+const Phone = ({ isFlipped }: { isFlipped: boolean }) => {
   return (
     <PhoneProvider>
-      <div className="relative w-[390px] h-[844px] scale-90 md:scale-100 transition-transform">
-        <div className="absolute -inset-2 bg-zinc-800 rounded-[48px] shadow-lg"></div>
-        <PhoneContentWithButtons />
+      <div className="relative w-[390px] h-[844px] scale-90 md:scale-100 transition-transform [perspective:2000px]">
+        <motion.div 
+            className="relative w-full h-full [transform-style:preserve-3d]"
+            initial={false}
+            animate={{ rotateY: isFlipped ? 180 : 0 }}
+            transition={{ duration: 0.7, ease: [0.32, 0.72, 0, 1] }}
+        >
+            <div className="absolute inset-0 w-full h-full [backface-visibility:hidden]">
+                <div className="absolute -inset-2 bg-zinc-800 rounded-[48px] shadow-lg"></div>
+                <PhoneContentWithButtons />
+            </div>
+             <PhoneBack />
+        </motion.div>
       </div>
     </PhoneProvider>
   );
