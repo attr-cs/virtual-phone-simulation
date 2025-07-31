@@ -8,7 +8,7 @@ import { Wifi, BatteryFull, BatteryMedium, BatteryLow, Signal, SignalLow, Signal
 import { Button } from '@/components/ui/button';
 import { Home } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import ControlCenter from '@/components/control-center';
+import ControlCenter from './control-center';
 import { motion, PanInfo, AnimatePresence } from 'framer-motion';
 
 const StatusBar = ({ onDragStart, onDrag, onDragEnd }: { onDragStart: any, onDrag: any, onDragEnd: any }) => {
@@ -86,9 +86,9 @@ const VolumeIndicator = ({ volume, isVisible }: { volume: number, isVisible: boo
         <AnimatePresence>
             {isVisible && (
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 20, transition: { duration: 0.3, delay: 1.5 } }}
+                    exit={{ opacity: 0, y: -20, transition: { duration: 0.3, delay: 1.5 } }}
                     className="absolute top-16 left-1/2 -translate-x-1/2 z-30 bg-black/70 backdrop-blur-sm text-white rounded-full px-4 py-2 flex items-center gap-2 shadow-lg"
                 >
                     {getVolumeIcon()}
@@ -136,12 +136,12 @@ const LockScreen = ({ onUnlock }: { onUnlock: () => void }) => {
 }
 
 const PhoneContent = () => {
-  const { app, wallpaper, setApp, brightness, volume, showVolume } = usePhone();
+  const { app, wallpaper, setApp, brightness, volume, showVolume, isLocked, setIsLocked } = usePhone();
   const CurrentApp = appMap[app].component;
   const [isControlCenterOpen, setControlCenterOpen] = useState(false);
   
   const handleDrag = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    if (info.offset.y > 50) {
+    if (info.offset.y > 50 && !isLocked) {
       setControlCenterOpen(true);
     }
     if (info.offset.y < -50) {
@@ -151,6 +151,9 @@ const PhoneContent = () => {
 
   return (
     <div className="relative w-full h-full bg-zinc-800 rounded-[40px] shadow-2xl overflow-hidden border-4 border-black">
+        <AnimatePresence>
+            {isLocked && <LockScreen onUnlock={() => setIsLocked(false)} />}
+        </AnimatePresence>
       <VolumeIndicator volume={volume} isVisible={showVolume} />
       <div className="relative w-full h-full" style={{ filter: `brightness(${brightness}%)`}}>
             <StatusBar 
@@ -175,17 +178,23 @@ const PhoneContent = () => {
                   </motion.div>
               </AnimatePresence>
             </div>
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 h-1 w-32 bg-white/80 rounded-full cursor-pointer" onClick={() => setApp('home')}></div>
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
+                <button
+                    onClick={() => setApp('home')}
+                    className="h-1 w-32 bg-white/80 rounded-full cursor-pointer transition-transform active:scale-95"
+                    aria-label="Home button"
+                />
+            </div>
       </div>
        <ControlCenter isOpen={isControlCenterOpen} setIsOpen={setControlCenterOpen} />
     </div>
   );
 };
 
-const SideButton = ({ className, ...props }: React.ComponentProps<'button'>) => (
+const SideButton = ({ className, ...props }: React.ComponentProps<typeof motion.button>) => (
     <motion.button 
-        className={cn("bg-zinc-600 rounded-md transition-colors", className)}
-        whileTap={{ backgroundColor: '#A1A1AA' }}
+        className={cn("bg-zinc-600 rounded-md", className)}
+        whileTap={{ scale: 0.95, backgroundColor: '#A1A1AA' }}
         {...props}
     />
 );
