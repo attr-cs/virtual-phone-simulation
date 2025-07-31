@@ -108,8 +108,14 @@ const VolumeIndicator = ({ volume, isVisible }: { volume: number, isVisible: boo
 
 const LockScreen = ({ onUnlock }: { onUnlock: () => void }) => {
     const [time, setTime] = useState('');
+    const [date, setDate] = useState('');
+
     useEffect(() => {
-        const update = () => setTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+        const update = () => {
+            const now = new Date();
+            setTime(now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+            setDate(now.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' }));
+        }
         update();
         const timer = setInterval(update, 1000 * 30);
         return () => clearInterval(timer);
@@ -125,7 +131,7 @@ const LockScreen = ({ onUnlock }: { onUnlock: () => void }) => {
         >
             <div className="absolute top-24 text-center">
                  <p className="text-7xl font-bold font-headline">{time}</p>
-                 <p className="text-xl">{new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}</p>
+                 <p className="text-xl">{date}</p>
             </div>
             <div className="absolute bottom-20 flex flex-col items-center gap-2">
                  <p className="text-sm font-medium">Tap to unlock</p>
@@ -235,3 +241,5 @@ const PhoneContentWithButtons = () => {
 }
 
 export default Phone;
+
+    
