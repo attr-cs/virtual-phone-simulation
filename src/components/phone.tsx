@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { PhoneProvider, usePhone } from '@/contexts/phone-context';
+import { usePhone } from '@/contexts/phone-context';
 import { appMap } from '@/config/apps';
 import { Wifi, BatteryFull, BatteryMedium, BatteryLow, Signal, SignalLow, SignalMedium, Sun } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -239,27 +239,6 @@ const SideButton = ({ className, ...props }: React.ComponentProps<typeof motion.
 );
 
 const Phone = ({ isFlipped }: { isFlipped: boolean }) => {
-  return (
-    <PhoneProvider>
-      <div className="relative w-[430px] h-[884px] scale-90 md:scale-100 transition-transform [perspective:2000px] group/phone">
-        <motion.div 
-            className="relative w-full h-full [transform-style:preserve-3d]"
-            initial={false}
-            animate={{ rotateY: isFlipped ? 180 : 0 }}
-            transition={{ duration: 0.7, ease: [0.32, 0.72, 0, 1] }}
-        >
-            <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] bg-zinc-800 rounded-[58px] shadow-lg">
-                <div className="absolute -inset-px bg-zinc-800 rounded-[58px] shadow-lg"></div>
-                <PhoneContentWithButtons />
-            </div>
-             <PhoneBack />
-        </motion.div>
-      </div>
-    </PhoneProvider>
-  );
-};
-
-const PhoneContentWithButtons = () => {
     const { setVolume, isLocked, setIsLocked } = usePhone();
 
     const handleVolumeUp = () => {
@@ -272,16 +251,26 @@ const PhoneContentWithButtons = () => {
     };
     const handlePower = () => setIsLocked(l => !l);
 
-    return (
-        <>
-            <PhoneContent />
-            <SideButton className="absolute left-[-6px] top-[120px] w-1.5 h-20" onClick={handleVolumeUp} />
-            <SideButton className="absolute left-[-6px] top-[210px] w-1.5 h-20" onClick={handleVolumeDown} />
-            <SideButton className="absolute right-[-6px] top-[180px] w-1.5 h-32" onClick={handlePower} />
-        </>
-    )
-}
+  return (
+    <div className="relative w-[430px] h-[884px] scale-90 md:scale-100 transition-transform [perspective:2000px] group/phone">
+      <SideButton className="absolute left-[-6px] top-[120px] w-1.5 h-20 z-20" onClick={handleVolumeUp} />
+      <SideButton className="absolute left-[-6px] top-[210px] w-1.5 h-20 z-20" onClick={handleVolumeDown} />
+      <SideButton className="absolute right-[-6px] top-[180px] w-1.5 h-32 z-20" onClick={handlePower} />
+      <motion.div 
+          className="relative w-full h-full [transform-style:preserve-3d]"
+          initial={false}
+          animate={{ rotateY: isFlipped ? 180 : 0 }}
+          transition={{ duration: 0.7, ease: [0.32, 0.72, 0, 1] }}
+      >
+          <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] bg-zinc-800 rounded-[58px] shadow-lg">
+              <div className="absolute -inset-px bg-zinc-800 rounded-[58px] shadow-lg"></div>
+              <PhoneContent />
+          </div>
+           <PhoneBack />
+      </motion.div>
+    </div>
+  );
+};
+
 
 export default Phone;
-
-    

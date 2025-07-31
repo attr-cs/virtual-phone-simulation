@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import Phone from '@/components/phone';
 import { Button } from '@/components/ui/button';
 import { Rotate3d } from 'lucide-react';
+import { PhoneProvider } from '@/contexts/phone-context';
 
 export default function Home() {
   const [isFlipped, setIsFlipped] = useState(false);
@@ -12,7 +13,9 @@ export default function Home() {
   return (
     <main className="flex min-h-screen items-center justify-center p-4">
       <div className="flex items-center gap-8">
-        <Phone isFlipped={isFlipped} />
+        <PhoneProvider>
+          <Phone isFlipped={isFlipped} />
+        </PhoneProvider>
         <div className="hidden md:flex flex-col gap-4">
           <Button 
             variant="outline"
